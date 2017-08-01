@@ -1,0 +1,21 @@
+<setup>
+    <block title="Configuration for the Cisco AMP for Endpoints Events Input" endpoint="admin/conf-inputs"
+           entity="amp4e_events_input">
+        <text>Setup the Input</text>
+        <input field="api_host">
+            <label>AMP API Host. Enter the address of Cisco AMP4E API Server that will be accessed by application for
+                managing event streams</label>
+            <type>text</type>
+        </input>
+
+        <input field="api_id">
+            <label>API Id. Enter the 3rd Party API Client ID provided by AMP</label>
+            <type>text</type>
+        </input>
+
+        <input field="api_key">
+            <label>API Key. Enter the API secret</label>
+            <type>text</type>
+        </input>
+    </block>
+</setup>

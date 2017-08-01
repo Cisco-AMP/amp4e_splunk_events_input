@@ -1,0 +1,9 @@
+<dashboard script="create_amp4e_events_input.js" isDashboard="false" isVisible="true" hideEdit="true">
+    <label>New Input</label>
+
+    <row>
+        <html>
+            <div id="create_amp4e_events_input">Please wait...</div>
+        </html>
+    </row>
+</dashboard>

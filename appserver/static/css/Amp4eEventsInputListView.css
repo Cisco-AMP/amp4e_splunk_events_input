@@ -1,0 +1,29 @@
+#createInputButton {
+  margin: 10px 0;
+}
+
+#table {
+  margin-top: 5px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+#table td {
+  word-wrap: break-word;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert-danger .alert-link {
+  color: #843534;
+  font-weight: 700;
+}
+
+.btn-danger:hover {
+  background-image: none;
+  border-color: #ac2925;
+}

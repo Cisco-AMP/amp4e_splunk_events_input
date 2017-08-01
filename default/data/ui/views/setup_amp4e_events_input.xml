@@ -1,0 +1,11 @@
+<form hideEdit="true" script="setup.js">
+  <label>Configuration</label>
+  <description>Global configuration for Cisco AMP4E Events Input.</description>
+	<row>
+	   <panel>
+	      <html>
+	         <div id="setupView">Please wait...</div>
+	      </html>
+	   </panel>
+	</row>
+</form>

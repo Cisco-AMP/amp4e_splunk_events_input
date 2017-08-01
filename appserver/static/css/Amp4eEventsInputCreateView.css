@@ -1,0 +1,20 @@
+form .control-group input,
+form .control-group select {
+  width: 50%;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert-danger .alert-link {
+  color: #843534;
+  font-weight: 700;
+}
+
+.select2-container .select2-choices {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

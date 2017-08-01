@@ -1,0 +1,45 @@
+<form>
+  <fieldset>
+    <legend>AMP Accessibility Configuration</legend>
+
+    <div class="control-group api_host">
+        <label class="control-label">
+          API Host
+          <span class="required">*</span>
+        </label>
+        <div class="controls">
+            <input type="text" name="api_host" placeholder="e.g. amp4e.com"/>
+            <span class="help-inline"></span>
+            <span class="help-block">
+                Enter the address of AMP4E API Server that will be accessed by application for managing event streams
+            </span>
+        </div>
+    </div>
+
+    <div class="control-group api_id">
+        <label class="control-label">
+          API Id
+          <span class="required">*</span>
+        </label>
+        <div class="controls">
+            <input type="text" name="api_id"/>
+            <span class="help-inline"></span>
+            <span class="help-block">3rd Party API Client ID provided by AMP</span>
+        </div>
+    </div>
+
+    <div class="control-group api_key">
+        <label class="control-label">
+          API Key
+          <span class="required">*</span>
+        </label>
+        <div class="controls">
+            <input type="text" name="api_key"/>
+            <span class="help-inline"></span>
+            <span class="help-block">The secret API key</span>
+        </div>
+    </div>
+  </fieldset>
+
+  <button href="#" class="btn btn-primary" id="save-config">Save Configuration</button>
+</form>

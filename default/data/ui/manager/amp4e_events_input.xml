@@ -1,0 +1,31 @@
+<endpoint name="data/inputs/amp4e_events_input">
+    <header>Cisco AMP4E Events Input</header>
+    <breadcrumb>
+        <parent hidecurrent="False">datainputstats</parent>
+        <name>AMP</name>
+    </breadcrumb>
+    <elements>
+        <element name="jsRedirection" type="javascript">
+            <view name="list"/>
+            <view name="create"/>
+            <view name="edit"/>
+            <key name="script">
+                window.top.location.replace(Splunk.util.make_full_url('app/amp4e_events_input/create_amp4e_events_input'));
+            </key>
+        </element>
+
+        <element name="ifJsIsDisabled" type="html">
+            <view name="list"/>
+            <view name="edit"/>
+            <view name="create"/>
+            <key name="content">
+                <![CDATA[
+                    Please create this input within the
+                    <a href="/app/amp4e_events_input/create_amp4e_events_input" target="_top">
+                        Cisco AMP4e Events Input App
+                    </a>
+                ]]>
+            </key>
+        </element>
+    </elements>
+</endpoint>
