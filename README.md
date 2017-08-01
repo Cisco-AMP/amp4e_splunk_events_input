@@ -81,7 +81,7 @@ This project was developed by Cisco AMP For Endpoints team
 
 ### License
 
-This project is licensed under the BSD 2-clause "Simplified" License - see the [LICENSE.txt](LICENSE.txt) file for details
+This project is licensed under the BSD 2-clause "Simplified" License - see the [LICENSE](LICENSE) file for details
 
 ### Acknowledgments
 
