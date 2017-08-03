@@ -18,3 +18,8 @@ form .control-group select {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+.select2-container .select2-choices {
+  max-height: 160px;
+  overflow-y: scroll;
+}

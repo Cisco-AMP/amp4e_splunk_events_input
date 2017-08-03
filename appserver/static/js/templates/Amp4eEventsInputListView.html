@@ -75,7 +75,7 @@
 
         <% for (var i = 0; i < inputs.length; i++) { %>
         <tr data-input-name="<%- inputs[i].name %>">
-            <td><a href="edit_amp4e_events_input?name=<%- inputs[i].name %>&namespace=<%- inputs[i].namespace %>&owner=<%- inputs[i].owner %>"><%- inputs[i].name %></a></td>
+            <td><a href="<%- inputs[i].href %>"><%- inputs[i].name %></a></td>
             <td><%- inputs[i].index %></td>
             <td><%- inputs[i].stream_name %></td>
 			<td><%- inputs[i].event_types %></td>

@@ -64,3 +64,6 @@ The event stream will be deleted from AMP along with the input.
 
 ### Searching for events
 By default, the events from the stream will be directed to the ‘main’ index. They will be populated with the sourcetype of cisco:amp:event
+
+## Support
+This project is open-source, please seek guidance at project's [github page](https://github.com/Cisco-AMP/amp4e_splunk_events_input).

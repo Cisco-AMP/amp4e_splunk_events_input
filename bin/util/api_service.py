@@ -57,11 +57,13 @@ class ApiService(object):
 
     @with_validated_response
     def event_types(self):
-        return requests.get(self.__construct_url('', self.EVENT_TYPES_ENDPOINT), auth=(self.api_id, self.api_key), verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url('', self.EVENT_TYPES_ENDPOINT), auth=(self.api_id, self.api_key),
+                            verify=self.VERIFY_SSL)
 
     @with_validated_response
     def groups(self):
-        return requests.get(self.__construct_url('', self.GROUPS_ENDPOINT), auth=(self.api_id, self.api_key), verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url('', self.GROUPS_ENDPOINT), auth=(self.api_id, self.api_key),
+                            verify=self.VERIFY_SSL)
 
     def __construct_url(self, ending = '', endpoint = STREAMS_ENDPOINT):
         return '{}://{}{}{}'.format(self.PROTO, self.host, endpoint, ending)
@@ -75,6 +77,18 @@ class ApiError(Exception):
                 'details': [
                     'API host could not be reached. Please make sure your API host configuration option is correct ' \
                     'and try again later.'
+                ]
+            }
+        ]
+    }
+    ENDPOINT_NOT_FOUND_ERRORS = {
+        'errors': [
+            {
+                'error_code': 404,
+                'description': 'Not found',
+                'details': [
+                    'One of AMP API endpoints could not be reached (status 404). Please contact your Cisco AMP '
+                    'Administrator to resolve this issue.'
                 ]
             }
         ]
@@ -98,6 +112,8 @@ class ApiError(Exception):
         try:
             if self.status == 503:
                 message = self.SERVICE_UNAVAILABLE_ERRORS
+            elif self.status == 404:
+                message = self.ENDPOINT_NOT_FOUND_ERRORS
             else:
                 message = json.loads(self.message)
                 try:

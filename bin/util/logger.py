@@ -5,7 +5,7 @@ import os
 
 class Logger:
     LOGGER_NAME = 'Amp4eEvents'
-    SPLUNK_HOME = '/opt/splunk'
+    SPLUNK_HOME = os.environ.get('SPLUNK_HOME', '/opt/splunk')
     LEVEL = 'DEBUG'
     logger_instance = None
 

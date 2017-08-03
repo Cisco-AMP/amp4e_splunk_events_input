@@ -105,12 +105,14 @@ define([
         },
 
         saveWithAPIIfInputValid: function() {
-            var inputName = this.getInputName();
+            var inputName = this.getInputName().trim();
 
             if (!inputName.length) {
-                this.showWarningMessage("<b>Input could not be saved:</b><br/>Input name cannot be empty.");
+                this.showWarningMessage("<b>Input could not be saved:</b><br/>" +
+                    "Input name cannot be empty or contain only whitespaces.");
             } else if (inputName.length >= 1024) {
-                this.showWarningMessage("<b>Input could not be saved:</b><br/>Input name must be less than 1024 characters.");
+                this.showWarningMessage("<b>Input could not be saved:</b><br/>" +
+                    "Input name must be less than 1024 characters.");
             } else if (this.ampInput) {
                 this.showWarningMessage("<b>Input could not be saved:</b><br/>Input with this name already exists.");
             } else {

@@ -55,8 +55,9 @@ class AmpStreamsApiController(controllers.BaseController):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         storage = AmpStorageWrapper(self.__metadata(kwargs.get('name')))
         stream = storage.find_stream()
-        self.__try_destroy_stream(amp_api, stream['id'])
-        storage.delete_stream()
+        if stream is not None:
+            self.__try_destroy_stream(amp_api, stream['id'])
+            storage.delete_stream()
         output = jsonresponse.JsonResponse()
         output.success = True
         return self.render_json(output)

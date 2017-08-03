@@ -377,6 +377,9 @@ define([
                     'owner': this.inputs.models[c].entry.acl.attributes.owner,
                     'disabled': this.inputs.models[c].entry.associated.content.attributes.disabled
                 };
+                new_entry['href'] = 'edit_amp4e_events_input?name=' + encodeURIComponent(new_entry.name) +
+                    '&namespace=' + encodeURIComponent(new_entry.namespace) +
+                    '&owner=' + encodeURIComponent(new_entry.owner);
 
                 inputs_json.push(new_entry);
             }
