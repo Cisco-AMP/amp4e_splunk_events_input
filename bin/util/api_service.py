@@ -12,6 +12,7 @@ class ApiService(object):
     GROUPS_ENDPOINT = '/v1/groups/'
     VERIFY_SSL = False
     JSON_HEADERS = {'Content-Type': 'application/json'}
+    REQUEST_TIMEOUT = 10
 
     def __init__(self, host, api_id, api_key):
         self.host = host
@@ -20,53 +21,57 @@ class ApiService(object):
 
     def with_validated_response(func):
         def wrapper(*args, **kwargs):
-            response = func(*args, **kwargs)
-            status = response.status_code
-            if status in range(200, 399):
-                if len(response.text) > 0:
-                    return response.json()
-            else:
-                raise ApiError(response.text, response.status_code)
+            try:
+                response = func(*args, **kwargs)
+                status = response.status_code
+                if status in range(200, 399):
+                    if len(response.text) > 0:
+                        return response.json()
+                else:
+                    raise ApiError(response.text, response.status_code)
+            except requests.exceptions.RequestException:
+                raise ApiError('Request failure', 502)
 
         return wrapper
 
     @with_validated_response
     def index(self):
-        return requests.get(self.__construct_url(), auth=(self.api_id, self.api_key), verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url(), **self.__shared_options())
 
     @with_validated_response
     def show(self, stream_id):
-        return requests.get(self.__construct_url(stream_id), auth=(self.api_id, self.api_key), verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url(stream_id), **self.__shared_options())
 
     @with_validated_response
     def create(self, params):
         params = StreamDictManager(params).for_api()
-        return requests.post(self.__construct_url(), auth=(self.api_id, self.api_key), data=json.dumps(params),
-                             headers=self.JSON_HEADERS, verify=self.VERIFY_SSL)
+        return requests.post(self.__construct_url(), data=json.dumps(params), headers=self.JSON_HEADERS,
+                             **self.__shared_options())
 
     @with_validated_response
     def update(self, stream_id, params):
         params = StreamDictManager(params).for_api()
-        return requests.patch(self.__construct_url(stream_id), auth=(self.api_id, self.api_key),
-                              data=json.dumps(params), headers=self.JSON_HEADERS, verify=self.VERIFY_SSL)
+        return requests.patch(self.__construct_url(stream_id), data=json.dumps(params), headers=self.JSON_HEADERS,
+                              **self.__shared_options())
 
     @with_validated_response
     def destroy(self, stream_id):
-        return requests.delete(self.__construct_url(stream_id), auth=(self.api_id, self.api_key),
-                               verify=self.VERIFY_SSL)
+        return requests.delete(self.__construct_url(stream_id), **self.__shared_options())
 
     @with_validated_response
     def event_types(self):
-        return requests.get(self.__construct_url('', self.EVENT_TYPES_ENDPOINT), auth=(self.api_id, self.api_key),
-                            verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url('', self.EVENT_TYPES_ENDPOINT), **self.__shared_options())
 
     @with_validated_response
     def groups(self):
-        return requests.get(self.__construct_url('', self.GROUPS_ENDPOINT), auth=(self.api_id, self.api_key),
-                            verify=self.VERIFY_SSL)
+        return requests.get(self.__construct_url('', self.GROUPS_ENDPOINT), **self.__shared_options())
 
-    def __construct_url(self, ending = '', endpoint = STREAMS_ENDPOINT):
+    def __construct_url(self, ending='', endpoint=STREAMS_ENDPOINT):
         return '{}://{}{}{}'.format(self.PROTO, self.host, endpoint, ending)
+
+    def __shared_options(self):
+        return {'auth': (self.api_id, self.api_key), 'verify': self.VERIFY_SSL, 'timeout': self.REQUEST_TIMEOUT}
+
 
 class ApiError(Exception):
     SERVICE_UNAVAILABLE_ERRORS = {
@@ -110,7 +115,7 @@ class ApiError(Exception):
 
     def __set_message(self):
         try:
-            if self.status == 503:
+            if self.status in range(502, 505):
                 message = self.SERVICE_UNAVAILABLE_ERRORS
             elif self.status == 404:
                 message = self.ENDPOINT_NOT_FOUND_ERRORS
