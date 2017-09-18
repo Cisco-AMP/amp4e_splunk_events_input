@@ -3,6 +3,7 @@ import json
 import requests
 
 from amp4e_events_input.stream_dict_manager import StreamDictManager
+from logger import logger
 
 
 class ApiService(object):
@@ -11,6 +12,7 @@ class ApiService(object):
     EVENT_TYPES_ENDPOINT = '/v1/event_types/'
     GROUPS_ENDPOINT = '/v1/groups/'
     VERIFY_SSL = False
+    HEADERS = {'Accept-Language': 'da, en-gb;q=0.8, en;q=0.7'}
     JSON_HEADERS = {'Content-Type': 'application/json'}
     REQUEST_TIMEOUT = 10
 
@@ -45,14 +47,12 @@ class ApiService(object):
     @with_validated_response
     def create(self, params):
         params = StreamDictManager(params).for_api()
-        return requests.post(self.__construct_url(), data=json.dumps(params), headers=self.JSON_HEADERS,
-                             **self.__shared_options())
+        return requests.post(self.__construct_url(), data=json.dumps(params), **self.__shared_options(True))
 
     @with_validated_response
     def update(self, stream_id, params):
         params = StreamDictManager(params).for_api()
-        return requests.patch(self.__construct_url(stream_id), data=json.dumps(params), headers=self.JSON_HEADERS,
-                              **self.__shared_options())
+        return requests.patch(self.__construct_url(stream_id), data=json.dumps(params), **self.__shared_options(True))
 
     @with_validated_response
     def destroy(self, stream_id):
@@ -69,8 +69,13 @@ class ApiService(object):
     def __construct_url(self, ending='', endpoint=STREAMS_ENDPOINT):
         return '{}://{}{}{}'.format(self.PROTO, self.host, endpoint, ending)
 
-    def __shared_options(self):
-        return {'auth': (self.api_id, self.api_key), 'verify': self.VERIFY_SSL, 'timeout': self.REQUEST_TIMEOUT}
+    def __shared_options(self, add_json_headers=False):
+        options = {'auth': (self.api_id, self.api_key), 'verify': self.VERIFY_SSL, 'timeout': self.REQUEST_TIMEOUT}
+        headers = self.HEADERS.copy()
+        if add_json_headers:
+            headers.update(self.JSON_HEADERS)
+        options['headers'] = headers
+        return options
 
 
 class ApiError(Exception):
@@ -103,6 +108,7 @@ class ApiError(Exception):
 
     def __init__(self, message, status):
         super(ApiError, self).__init__(message)
+        logger.error('API Error (status {}): {}'.format(status, str(message)))
         self.status = status
         self.stream_is_not_found = False
         self.__set_message()

@@ -6,6 +6,13 @@
 This input provides a mechanism to create, update, and delete event streams in Cisco Advanced Malware Protection (AMP) for Endpoints via the API and index them in your Splunk® instance to make them searchable. All you need to do is provide your API host and credentials from your AMP for Endpoints account and specify the stream parameters (like events or which event types and groups should be directed to this stream). 
 This app was tested on Splunk v6.6.0
 
+####Words of Warning 
+This app has not been tested on Splunk clustered instances. The app does not sync with existing data at 
+Event Streams API, so if you have some event streams created without Splunk, you will not see them in Splunk 
+interface. You will also get the Streams Limit Reached error even though the amount of your inputs
+will be within the limit. In this case to keep creating the inputs one option would be to remove the event streams 
+that have not been created with Splunk.
+
 
 ## Prerequisites
 It is expected that a user of this app: 

@@ -24,7 +24,7 @@ class StreamConsumer(object):
 
     def run(self):
         try:
-            logger.info('Connecting to {}'.format(self._url))
+            logger.debug('Connecting to {}'.format(self._url))
             self._connection = pika.BlockingConnection(pika.URLParameters(self._url))
             self.start_consuming()
         except (AMQPChannelError, ConnectionClosed, NoFreeChannels) as e:
@@ -56,6 +56,6 @@ class StreamConsumer(object):
         self._channel.start_consuming()
 
     def on_message(self, _channel, basic_deliver, _properties, body):
-        logger.info('Received message with rk:' + basic_deliver.routing_key)
+        logger.debug('Received message with rk:' + basic_deliver.routing_key)
         self.on_event_callback(body)
         self._channel.basic_ack(basic_deliver.delivery_tag)

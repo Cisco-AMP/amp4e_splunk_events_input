@@ -20,9 +20,6 @@ class Amp4eEventsInput(Script):
         'api_id': ['3rd Party API Client ID provided by AMP', True, True],
         'api_key': ['API secret', True, True]
     }
-    RMQ_HOST = '192.168.50.6'  # fetch from env?
-    RMQ_PORT = '5672'
-    AMP_HOST = 'https://portal'
 
     def get_scheme(self):
         scheme = Scheme('Cisco AMP for Endpoints Events Input')
