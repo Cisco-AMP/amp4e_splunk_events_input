@@ -10,6 +10,7 @@ from logger import logger
 class StreamConsumer(object):
     # Reconnection timeout with 2-second +- random window
     RECONNECT_TIMEOUT = 3
+    AMQP_PROTO = 'https'
 
     def __init__(self, connection_data, on_event_callback):
         self._connection = None
@@ -17,7 +18,7 @@ class StreamConsumer(object):
         self._closing = False
         self._consumer_tag = None
         self._queue_name = connection_data['queue_name']
-        self._url = "{}://{}:{}@{}:{}".format(connection_data['proto'], connection_data['user_name'],
+        self._url = "{}://{}:{}@{}:{}".format(self.AMQP_PROTO, connection_data['user_name'],
                                               connection_data['password'], connection_data['host'],
                                               connection_data['port'])
         self.on_event_callback = on_event_callback
@@ -52,7 +53,7 @@ class StreamConsumer(object):
         self._channel = self._connection.channel()
         self._channel.queue_declare(self._queue_name, passive=True)
         self._channel.basic_consume(self.on_message, self._queue_name)
-        logger.info('Connected. Staring to consume.')
+        logger.info('Connected. Starting to consume.')
         self._channel.start_consuming()
 
     def on_message(self, _channel, basic_deliver, _properties, body):

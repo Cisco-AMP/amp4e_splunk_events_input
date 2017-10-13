@@ -1,6 +1,7 @@
 import json
 
 import requests
+import traceback
 
 from amp4e_events_input.stream_dict_manager import StreamDictManager
 from logger import logger
@@ -14,7 +15,7 @@ class ApiService(object):
     VERIFY_SSL = False
     HEADERS = {'Accept-Language': 'da, en-gb;q=0.8, en;q=0.7'}
     JSON_HEADERS = {'Content-Type': 'application/json'}
-    REQUEST_TIMEOUT = 10
+    REQUEST_TIMEOUT = 300
 
     def __init__(self, host, api_id, api_key):
         self.host = host
@@ -25,14 +26,17 @@ class ApiService(object):
         def wrapper(*args, **kwargs):
             try:
                 response = func(*args, **kwargs)
+                logger.info('Received response from ApiService ({})'.format(response.status_code))
                 status = response.status_code
                 if status in range(200, 399):
                     if len(response.text) > 0:
                         return response.json()
                 else:
                     raise ApiError(response.text, response.status_code)
-            except requests.exceptions.RequestException:
-                raise ApiError('Request failure', 502)
+            except requests.exceptions.RequestException as e:
+                logger.error(traceback.format_exc())
+                logger.error(repr(e))
+                raise ApiError('Request failure: {}'.format(e.__class__, repr(e)), 502)
 
         return wrapper
 
@@ -47,6 +51,7 @@ class ApiService(object):
     @with_validated_response
     def create(self, params):
         params = StreamDictManager(params).for_api()
+        logger.info('ApiService - creating stream with params {}'.format(params))
         return requests.post(self.__construct_url(), data=json.dumps(params), **self.__shared_options(True))
 
     @with_validated_response
@@ -97,18 +102,18 @@ class ApiError(Exception):
                 'error_code': 404,
                 'description': 'Not found',
                 'details': [
-                    'One of AMP API endpoints could not be reached (status 404). Please contact your Cisco AMP '
+                    'One of AMP for Endpoints API endpoints could not be reached (status 404). Please contact your Cisco AMP for Endpoints ' \
                     'Administrator to resolve this issue.'
                 ]
             }
         ]
     }
     STREAM_NOT_FOUND = 'Looks like the stream you requested does not exist at API server. This might have ' \
-                       'happened because the stream has been deleted directly through API. Please contact the support.'
+                       'happened because the stream has been deleted directly through API. Please contact support.'
 
     def __init__(self, message, status):
         super(ApiError, self).__init__(message)
-        logger.error('API Error (status {}): {}'.format(status, str(message)))
+        logger.error('API Error (status {}): {}'.format(status, message))
         self.status = status
         self.stream_is_not_found = False
         self.__set_message()
@@ -122,9 +127,10 @@ class ApiError(Exception):
     def __set_message(self):
         try:
             if self.status in range(502, 505):
-                message = self.SERVICE_UNAVAILABLE_ERRORS
+                return
             elif self.status == 404:
                 message = self.ENDPOINT_NOT_FOUND_ERRORS
+                self.message = message['errors']
             else:
                 message = json.loads(self.message)
                 try:
@@ -132,8 +138,8 @@ class ApiError(Exception):
                                     'event stream not found' in message['errors'][0]['details'][0].lower():
                         message['errors'][0]['details'] = [self.STREAM_NOT_FOUND]
                         self.stream_is_not_found = True
+                    self.message = message['errors']
                 except (AttributeError, IndexError, KeyError):
                     pass
-            self.message = message['errors']
         except (ValueError, KeyError):
             pass

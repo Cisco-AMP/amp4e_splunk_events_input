@@ -1,6 +1,6 @@
 <form hideEdit="true" script="setup.js">
   <label>Configuration</label>
-  <description>Global configuration for Cisco AMP4E Events Input.</description>
+  <description>Global configuration for Cisco AMP for Endpoints events input</description>
 	<row>
 	   <panel>
 	      <html>

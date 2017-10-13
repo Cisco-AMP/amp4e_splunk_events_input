@@ -68,6 +68,7 @@ define([
             this.apiKey = null;
             this.ampInputConfiguration = null;
             this.ampInput = null;
+            this.eventsGroups = {};
             this.searchParams = new URL(location.href).searchParams;
             this.isUpdatePage = this.searchParams.has('name');
         },
@@ -167,24 +168,20 @@ define([
                         this.saveInput();
                     } else {
                         this.showFormInProgress(false);
-
+                        var error = JSON.stringify(data);
                         if (data.error) {
-                            var error;
                             if (data.error instanceof Array) {
-                                error = data.error.map(function(err){
-                                    return err.details.join('<br/>');
-                                }).join('<br/>');
+                                error = data.error.map(err => err.details.join('<br/>')).join('<br/>');
                             } else {
-                                error = "API host could not be reached. Please make sure your API host configuration option is correct and try again later.";
+                                error = JSON.stringify(error);
                             }
-                            this.showWarningMessage("<b>Input could not be saved:</b><br/> " + error);
-                        } else {
-                            this.showWarningMessage("Input could not be saved");
                         }
+
+                        this.showWarningMessage("<b>Input could not be saved:</b><br/> " + error);
                     }
                 }.bind(this),
                 error: function (err) {
-                    this.showWarningMessage("Input could not be saved due to server error");
+                    this.showWarningMessage("Input could not be saved due to server error" + JSON.stringify(err));
                     this.showFormInProgress(false);
                 }.bind(this)
             });
@@ -220,6 +217,10 @@ define([
             $('input,select,button', this.el).prop('disabled', !enabled);
         },
 
+        getEventsGroupsNames: function(selected_ids) {
+            return (selected_ids || []).map(item => this.eventsGroups[item]).join('---');
+        },
+
         getStreamOptions: function() {
             return Object.assign({
                 name: this.getInputName(),
@@ -228,10 +229,15 @@ define([
         },
 
         getStreamUpdateOptions: function() {
+            var event_types = this.getStreamEventTypes();
+            var groups = this.getStreamGroups();
+
             return Object.assign({
                 stream_name: this.getStreamName(),
-                event_types: Array(this.getStreamEventTypes()).join(','),
-                groups: Array(this.getStreamGroups()).join(',')
+                event_types: Array(event_types).join(','),
+                groups: Array(groups).join(','),
+                event_types_names: this.getEventsGroupsNames(event_types),
+                groups_names: this.getEventsGroupsNames(groups)
             }, this.getAPIOptions());
         },
 
@@ -258,9 +264,11 @@ define([
             this.setControlsEnabled(!inProgress);
 
             if (inProgress) {
-                $('.btn-primary').text("Saving Changes...");
+                $('.btn-primary').html("<i class='icon-clock'></i>Saving");
+                $('span.saving').show();
             } else {
-                $('.btn-primary').text("Save");
+                $('.btn-primary').html("Save");
+                $('span.saving').hide();
             }
         },
 
@@ -303,9 +311,7 @@ define([
         },
 
         initSelectTag: function(obj, endpoint, selected_array = []) {
-            var $element = obj.select2({
-                width: $(this.formProperties['streamName']).outerWidth()
-            });
+            var $element = obj.select2();
 
             var $request = $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/" + endpoint),
@@ -319,9 +325,11 @@ define([
                     _this.showErrorMessage('.wrong-conf');
                 } else {
                     data.map(function(item) {
-                        var id = item.id || item.guid;
-                        var selected = selected_array.includes(id.toString());
-                        var option = new Option(item.name + ' (' + id + ')', id, selected, selected);
+                        var id = item.id || item.guid,
+                            selected = selected_array.includes(id.toString()),
+                            name = item.name + ' (' + id + ')',
+                            option = new Option(name, id, selected, selected);
+                        _this.eventsGroups[id] = name;
                         $element.append(option);
                     });
 

@@ -16,14 +16,16 @@ class Amp4eEventsInput(Script):
         'stream_name': ['The event stream name', True, True],
         'event_types': ['Enter event type evt_ids for the stream', True, True],
         'groups': ['Enter group guids for the stream', False, False],
-        'api_host': ['AMP API host', True, True],
-        'api_id': ['3rd Party API Client ID provided by AMP', True, True],
-        'api_key': ['API secret', True, True]
+        'api_host': ['AMP for Endpoints API host', True, True],
+        'api_id': ['3rd Party API Client ID provided by AMP for Endpoints', True, True],
+        'api_key': ['API secret', True, True],
+        'event_types_names': ['Event types names', True, True],
+        'groups_names': ['Groups names', False, False]
     }
 
     def get_scheme(self):
         scheme = Scheme('Cisco AMP for Endpoints Events Input')
-        scheme.description = 'Allows creating and managing event streams from AMP'
+        scheme.description = 'Allows creating and managing event streams from AMP for Endpoints'
         scheme.use_external_validation = False
         scheme.use_single_instance = False
         self.__add_scheme_arguments(scheme)
@@ -71,7 +73,7 @@ class Amp4eEventsInput(Script):
     def __stream_from_inputs(self, inputs):
         storage = AmpStorageWrapper(inputs.metadata)
         stream = storage.find_stream()
-        logger.debug('Found Stream: ' + str(stream))
+        logger.debug('Found Stream: {}'.format(stream.get('name')))
         # connection_data = stream['amqp_credentials']
         # Change this in development if we have no correct data from API
         # connection_data.update({'host': self.RMQ_HOST, 'port': self.RMQ_PORT})
@@ -80,7 +82,7 @@ class Amp4eEventsInput(Script):
     def __on_event_callback(self, event_json, ew, options):
         logger.debug('Received event with input {}'.format(options['input_name']))
         index = options['index'] if options.get('index') is not None else 'main'
-        host = options['host'] if options.get('host') is not None else 'Cisco AMP For Endpoints'
+        host = options['host'] if options.get('host') is not None else 'Cisco AMP for Endpoints'
         decoded_event = json.loads(event_json)
         # decoded_event['timestamp'] = time.time()  # commented out for real-time events
         event = Event(stanza=options['input_name'], data=json.dumps({'event': decoded_event}), host=host,

@@ -2,14 +2,21 @@
   margin: 10px 0;
 }
 
-#table {
+#inputs-table {
   margin-top: 5px;
   table-layout: fixed;
   width: 100%;
 }
 
-#table td {
+#inputs-table td {
   word-wrap: break-word;
+}
+
+#inputs-table .icon-alert {
+  font-size: medium;
+  color: #d6563c;
+  position: absolute;
+  left: 14px;
 }
 
 .alert-danger {
@@ -26,4 +33,9 @@
 .btn-danger:hover {
   background-image: none;
   border-color: #ac2925;
+}
+
+.stream-divider {
+  margin: 10px -10px;
+  border: 10px solid #eee;
 }

@@ -1,6 +1,20 @@
-form .control-group input,
-form .control-group select {
-  width: 50%;
+form .control-group input {
+  width: 500px;
+}
+
+form .control-group select,
+form .control-group .select2-container {
+  width: 514px;
+}
+
+form .btn-primary .icon-clock {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+form .saving {
+  display: none;
+  margin-left: 10px;
 }
 
 .alert-danger {

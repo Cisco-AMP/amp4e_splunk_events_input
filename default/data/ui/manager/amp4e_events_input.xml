@@ -1,8 +1,8 @@
 <endpoint name="data/inputs/amp4e_events_input">
-    <header>Cisco AMP4E Events Input</header>
+    <header>Cisco AMP for Endpoints Events Input</header>
     <breadcrumb>
         <parent hidecurrent="False">datainputstats</parent>
-        <name>AMP</name>
+        <name>AMP for Endpoints</name>
     </breadcrumb>
     <elements>
         <element name="jsRedirection" type="javascript">
@@ -22,7 +22,7 @@
                 <![CDATA[
                     Please create this input within the
                     <a href="/app/amp4e_events_input/create_amp4e_events_input" target="_top">
-                        Cisco AMP4e Events Input App
+                        Cisco AMP for Endpoints Events Input App
                     </a>
                 ]]>
             </key>

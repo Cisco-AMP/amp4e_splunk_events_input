@@ -11,6 +11,7 @@ from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
 sys.path.append(make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
 
 from util.api_service import ApiService, ApiError
+from util.logger import logger
 from amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
 from amp4e_events_input.stream_dict_manager import StreamDictManager
 
@@ -31,20 +32,31 @@ class AmpStreamsApiController(controllers.BaseController):
         return wrapper
 
     @jsonify_errors
+    @expose_page(must_login=True, methods=['GET'])
+    def event_streams_list(self, **kwargs):
+        amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
+        response = amp_api.index()
+        return self.render_json(response['data'])
+
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET', 'POST'])
     def save_stream(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         storage = AmpStorageWrapper(self.__metadata(kwargs.get('name')))
         stream = storage.find_stream()
         if stream is None:
+            logger.info('Controller - Creating the stream at API')
             response = amp_api.create(kwargs)
+            logger.info('Controller - Created the stream at API: {}'.format(kwargs.get('name')))
             storage.save_stream_with_data(StreamDictManager(response['data']).merged_with(kwargs))
         else:
             dict_manager = StreamDictManager(stream)
             diff = dict_manager.diff_fields_from(kwargs)
             if len(diff) > 0:
+                logger.info('Controller - Updating the stream at API {}'.format(stream.get('name')))
                 amp_api.update(stream['id'], diff)
                 storage.save_stream_with_data(dict_manager.merged_with(kwargs))
+                logger.info('Controller - Updated the stream at API')
         output = jsonresponse.JsonResponse()
         output.success = True
         return self.render_json(output)
@@ -55,9 +67,19 @@ class AmpStreamsApiController(controllers.BaseController):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         storage = AmpStorageWrapper(self.__metadata(kwargs.get('name')))
         stream = storage.find_stream()
+        logger.info('Controller - Deleting the stream at API: {}'.format(stream.get('name')))
         if stream is not None:
             self.__try_destroy_stream(amp_api, stream['id'])
             storage.delete_stream()
+        output = jsonresponse.JsonResponse()
+        output.success = True
+        return self.render_json(output)
+
+    @jsonify_errors
+    @expose_page(must_login=True, methods=['GET', 'DELETE'])
+    def delete_event_stream(self, **kwargs):
+        amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
+        self.__try_destroy_stream(amp_api, kwargs['id'])
         output = jsonresponse.JsonResponse()
         output.success = True
         return self.render_json(output)
@@ -85,7 +107,8 @@ class AmpStreamsApiController(controllers.BaseController):
     def __metadata(self, name):
         return {
             'name': name,
-            'session_key': cherrypy.session.get('sessionKey')
+            'session_key': cherrypy.session.get('sessionKey'),
+            'server_uri': self.splunkd_urlhost
         }
 
     def __try_destroy_stream(self, amp_api, stream_id):

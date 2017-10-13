@@ -5,8 +5,6 @@ from splunklib.client import Service
 
 # Overrides splunk-sdk's Script service property in order to use service with settable owner and app
 class TransientServiceFactory(object):
-    SERVER_URI = 'https://127.0.0.1:8089'
-
     def __init__(self, metadata, owner, app):
         self.owner = owner
         self.app = app
@@ -16,7 +14,7 @@ class TransientServiceFactory(object):
         if self.metadata is None:
             return None
 
-        splunkd_uri = self.SERVER_URI
+        splunkd_uri = self.metadata['server_uri']
         session_key = self.metadata['session_key']
 
         splunkd = urlsplit(splunkd_uri, allow_fragments=False)

@@ -1,5 +1,4 @@
 import re
-from util.logger import logger
 
 
 # Transforms the stream data for API parameters and back, checks for diffs between stream data hashes
