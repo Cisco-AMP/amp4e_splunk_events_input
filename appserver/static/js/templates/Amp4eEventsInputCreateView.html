@@ -20,9 +20,7 @@
   </div>
 
   <div class="control-group input_index">
-    <label class="control-label">
-      Index
-    </label>
+    <label class="control-label">Index</label>
     <div class="controls">
       <select id="splunkIndexes" name="index"></select>
       <span class="help-inline"></span>
@@ -45,12 +43,9 @@
     </div>
 
     <div class="control-group stream_event_types">
-      <label class="control-label">
-        Event Types
-        <span class="required">*</span>
-      </label>
+      <label class="control-label">Event Types</label>
       <div class="controls">
-        <select name="event_types" multiple="multiple"></select>
+        <select name="event_types" multiple="multiple" data-placeholder="Leave this field blank to return all Event types"></select>
         <span class="help-inline"></span>
       </div>
     </div>
@@ -58,7 +53,7 @@
     <div class="control-group stream_groups">
       <label class="control-label">Groups</label>
       <div class="controls">
-        <select name="groups" multiple="multiple"></select>
+        <select name="groups" multiple="multiple" data-placeholder="Leave this field blank to return all Groups"></select>
         <span class="help-inline"></span>
       </div>
     </div>

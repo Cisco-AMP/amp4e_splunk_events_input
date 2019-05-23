@@ -1,0 +1,8 @@
+splunk-sdk==1.6.2
+pika==0.13.1
+
+requests
+requests_mock
+six
+fabric==1.13.2
+enum

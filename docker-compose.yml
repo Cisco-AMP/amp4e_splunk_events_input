@@ -1,0 +1,26 @@
+version: '3.6'
+services:
+  splunk:
+    build: .
+    volumes:
+      - type: bind
+        source: ./
+        target: /opt/splunk/etc/apps/amp4e_events_input
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - DEBUG=true
+    ports:
+      - "8000:8000"
+    working_dir: /opt/splunk/etc/apps/amp4e_events_input
+    entrypoint: /sbin/amp_entrypoint.sh
+    command: start-service
+# Uncomment below for a clean container to use for testing
+  # splunk-test:
+  #   image: splunk/splunk:7.0.3
+  #   environment:
+  #     - SPLUNK_START_ARGS=--accept-license
+  #     - DEBUG=true
+  #   ports:
+  #     - "8001:8000"
+  #   entrypoint: /sbin/entrypoint.sh
+  #   command: start-service

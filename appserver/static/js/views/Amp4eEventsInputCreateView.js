@@ -127,7 +127,7 @@ define([
         setInputsData: function(){
             if (this.ampInput) {
                 this.setStreamName(this.ampInput.content.stream_name);
-                this.initSelectTag($(this.formProperties['streamEventTypes']), 'event_types_list', this.ampInput.content.event_types.split(','));
+                this.initSelectTag($(this.formProperties['streamEventTypes']), 'event_types_list', this.ampInput.content.event_types ? this.ampInput.content.event_types.split(',') : []);
                 this.initSelectTag($(this.formProperties['streamGroups']), 'groups_list', this.ampInput.content.groups ? this.ampInput.content.groups.split(',') : []);
 
                 $('.dashboard-title').html('Edit Input "' + this.getInputName() + '"');

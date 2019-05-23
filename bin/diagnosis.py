@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 from splunklib.client import Service
 import pika as pika
 
-SPLUNK_HOME = os.environ.get('SPLUNK_HOME', '/opt/splunk')
+SPLUNK_HOME = os.environ.get('SPLUNK_HOME', sys.prefix)
 service = None
 current_time = lambda: datetime.datetime.now().isoformat()
 

@@ -3,3 +3,7 @@ local/*
 metadata/local.meta
 *.pyc
 *.pyo
+/tmp
+!/tmp/.keep
+/release/*.spl
+.DS_Store

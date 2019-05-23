@@ -1,90 +1,118 @@
-## Cisco AMP for Endpoints Events Input development instructions
+# Cisco AMP for Endpoints Events Input
 
-The Cisco AMP for Endpoints Events Input provides a mechanism to create, update, and delete event streams in
-Cisco Advanced Malware Protection (AMP) for Endpoints via the API and index them in your Splunk® instance to make them
-searchable. All you need to do is provide your API host and credentials from your AMP for Endpoints account and specify
-the stream parameters (like events or which event types and groups should be directed to this stream).
-This app was tested on Splunk v6.6.0.
+## Prerequisites
 
-Essentially the app is a Splunk Modular Input with custom interface and custom-wrapped actions.
+* docker
+* docker-compose
 
-### Prerequisites
+## Usage
 
-You need a local instance of Splunk Enterprise in order to use and develop this software. This app was developed with
-Python 2.7
+```bash
+docker-compose up --build
+```
 
-### Installing
+access Splunk at [http://localhost:8000](http://localhost:8000)
 
-1. You can clone the project into any directory and then link the directory to `$SPLUNK_HOME/etc/apps/amp4e_events_input`.
-2. To install the app dependencies with pip, within the project root run
-`pip install -r bin/requirements-splunk.txt --target=bin`.
-3. Install requests_mock as it's the dependency for the tests: `pip install 'requests_mock==1.3.0'`
-4. Restart Splunk
+## Configure splunkd to use your HTTP Proxy Server
 
-After these actions you will have the app installed and can get to coding. Please note that in order to have your
-changes reflected you'll have to restart the Splunk instance.
+In `$SPLUNK_HOME/etc/system/local/server.conf` (or any other applicable location, if you are using a deployment server),
+make the following changes to the `[proxyConfig]` stanza:
 
-All input logging gets directed to `$SPLUNK_HOME/var/log/splunk/amp4e_events_input.log`
+```conf
+[proxyConfig]
+http_proxy = <string that identifies the server proxy. When set, splunkd sends all HTTP requests through
+this proxy server. The default value is unset.>
+https_proxy = <string that identifies the server proxy. When set, splunkd sends all HTTPS requests
+through the proxy server defined here. If not set, splunkd uses the proxy defined in http_proxy. The
+default value is unset.>
+no_proxy = <string that identifies the no proxy rules. When set, splunkd uses the [no_proxy] rules to
+decide whether the proxy server needs to be bypassed for matching hosts and IP Addresses. Requests going
+to localhost/loopback address are not proxied. Default is "localhost, 127.0.0.1, ::1">
+```
 
-### Running the tests
+You can also configure proxies by setting the environment variables `HTTP_PROXY` and `HTTPS_PROXY`.
 
-- Enter your admin credentials in test/support/config.py
-- To run all unit tests, `python -m unittest discover`.
-- If you'd like to run a single test, refer to it as to a module:
-    `python -m unittest test.amp4e_events_input.test_stream_dict_manager`
+## Configure Splunk Web to use the key and certificate files
 
+In `$SPLUNK_HOME/etc/system/local/web.conf` (or any other applicable location, if you are using a deployment server),
+make the following changes to the `[settings]` stanza:
 
-### Understanding the input lifecycle
+```conf
+[settings]
+enableSplunkWebSSL = true
+privKeyPath = </home/etc/auth/mycerts/mySplunkWebPrivateKey.key >
+Absolute paths may be used. non-absolute paths are relative to $SPLUNK_HOME
 
-Each input is directly connected to the entity within AMP for Endpoints which is called an *event stream*. Event stream requires
-a name and at least one event type to generate a queue that will ingest only events that correspond to the filter. By
-interacting with the input the user is in fact modifying the event stream at AMP for Endpoints.
+serverCert = </home/etc/auth/mycerts/mySplunkWebCertificate.pem >
+Absolute paths may be used. non-absolute paths are relative to $SPLUNK_HOME
+```
 
-**Creating/updating**
+You can also configure certificate by setting the environment variable `SSL_CERT_FILE`.
 
-The only difference between creating and updating the input is that on create user can set the input's name and Splunk
-index to direct events to.
+## Nuances
 
-When a user fills out the AMP for Endpoints Events Input form, the parameters first get sent to custom Splunk endpoint, *save_stream*
-(within amp_streams_api_controller). There, a KV Store lookup is performed (this will be clarified further) to find out
-if the input with this name already exists:
-- If it does not, we start the create procedure - the parameters are sent to
-*create* Event Streams API endpoint, where they get validated (any validation failures are then displayed in Splunk
-interface). If the validation passes, a new KV store item gets created with combined data from input and newly-created
- event stream, only then the input itself gets stored at Splunk.
-- If it does, the update procedure kicks in - parameters are sent to *update* Event Streams API endpoint, and the same
-procedure as on *create* gets repeated, save for the KV store item which is not created, but updated with new data.
+Docker complains of an upgrade during startup. This is because the initial Splunk setup initializes some databases.
+Remove the container and start again.
 
-As soon as the input gets created, Splunk launches the consumer for RabbitMQ queue that corresponds to the event stream.
-Upon receiving a message, the consumer publishes it as an Event to Splunk index (specified on input creation)
+```bash
+docker-compose down
+docker-compose up
+```
 
+* The changes in input app require the Splunk to be restarted. When you have made some changes, restart Splunk: `docker-compose exec splunk /opt/splunk/bin/splunk restart`
+* Do not push your *local* folder to git repository, as it stores values that belong to your unique Splunk instance.
+* If you need to add a python library dependency - enter its name within the *bin/requirements-splunk.txt* and run `pip install -r bin/requirements-splunk.txt --target=$SPLUNK_HOME/lib/python2.7/site-packages`.
+* By default, Splunk will display 2 info messages about version updates when you reach its dashboard for the first time. If you see other messages (warnings or errors) - you most certainly need to fix your input app to make them disappear.
+* To perform a command within splunk python interpreter, run it with splunk cmd python, e.g.: `splunk cmd python amp4e_events_input.py --scheme`
 
-**Listing**
+## Testing
 
-All inputs are listed as they are stored in Splunk. No API lookups are performed here.
+* Enter your admin credentials in test/support/config.py
+* To execute all tests, `docker-compose exec splunk /opt/splunk/bin/splunk cmd python -m unittest discover`.
+* If you'd like to run a single test, refer to it as to a module:
+    `docker-compose exec splunk /opt/splunk/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager`
+* When testing upgrading the app, you can uncomment the `splun-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
 
+## Diag
 
-**Deleting**
+If a customer is having issues with the app, you should consider providing an output of diag script to authorized Cisco
+representative:
 
-As soon as the user confirms the input deletion, a request is sent to custom Splunk endpoint, *delete_stream*, which
-deletes the stream at Event Streams API and from KV Store. Then, the Splunk input gets deleted.
+```bash
+splunk login
+splunk diag --collect app:amp4e_events_input
+```
 
+The script will result in a *.tar.gz file, which will contain data that will greatly help us figure out your issue. These data will include sensitive information about your Splunk instance, so please **make sure you provide it ONLY to authorized Cisco representative**
 
-### Contributing
+## Release
 
-If you've developed a feature, don't hesitate to submit a pull request for review!
-Please make sure your code is properly documented and tested, as it will facilitate fast reviewing.
+### General instructions
 
-### Authors
+Whenever a new release is made, please keep in mind that default/app.conf should be updated accordingly - *build* attribute of the `[install]` stanza and *version* attribute of the `[launcher]` stanza must be changed if needed. The *build* specifies the assets version in order to know when to expire the browser cache. It should be an integer, which you increment after you change something in app/static before release, as per Splunk's recommendations. The *version* is a version string, constructed according to [semver recommendations](https://semver.org/).
 
-This project was developed by Cisco AMP For Endpoints team
+### Gotchas
 
-### License
+When installing or upgrading the app, Splunk simply copies all the files from the package provided into /`opt/splunk/etc/apps/<your_package_name>`. This means that if a file or folder is deleted in a newer version of the app, when a user upgrades their app, that file will remain. It needs to be called out specifically in the upgrade process documentation that the user will need to delete it from their Splunk server.
 
-This project is licensed under the BSD 2-clause "Simplified" License - see the [LICENSE](LICENSE) file for details
+### Splunkbase release
 
-### Acknowledgments
+Creates a package for release on Splunkbase.
 
-* [Luke Murphey](https://github.com/LukeMurphey). Some front-end parts of the project were based on Luke's findings in
-[Splunk Web Input](https://github.com/LukeMurphey/splunk-web-input)
-* Brian from Northern Trust
+```bash
+docker-compose exec splunk sh -c "cd release;fab splunkbase_release"
+```
+
+## Known Issues
+
+### Errors
+
+```bash
+ValueError: Expected instance of Parameters, not <URLParameters host=export-streaming.amp.cisco.com port=443 virtual_host=/ ssl=True>
+```
+
+* This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `/opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
+
+    ```bash
+    $ rm -rf /opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika
+    ```

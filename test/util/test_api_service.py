@@ -2,7 +2,7 @@ import unittest
 import json
 import requests_mock
 
-from bin.util.api_service import ApiService, ApiError
+from util.api_service import ApiService, ApiError
 
 
 class TestApiService(unittest.TestCase):
@@ -105,7 +105,7 @@ class TestApiError(unittest.TestCase):
     # Returns correct error message if status is 503
     def test_extract_service_unavailable(self):
         self.api_error = ApiError(self.DEFAULT_ERROR, 503)
-        self.assertEqual(self.api_error.extract_data_from_message(), ApiError.SERVICE_UNAVAILABLE_ERRORS['errors'])
+        self.assertEqual(self.api_error.extract_data_from_message(), self.DEFAULT_ERROR)
 
     # Returns text representation of error if it is not in API format
     def text_extract_unknown_error(self):

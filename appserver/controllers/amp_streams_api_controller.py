@@ -8,7 +8,7 @@ from splunk.appserver.mrsparkle.lib.decorators import expose_page
 import splunk.appserver.mrsparkle.controllers as controllers
 from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
 
-sys.path.append(make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
 
 from util.api_service import ApiService, ApiError
 from util.logger import logger
@@ -67,8 +67,8 @@ class AmpStreamsApiController(controllers.BaseController):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         storage = AmpStorageWrapper(self.__metadata(kwargs.get('name')))
         stream = storage.find_stream()
-        logger.info('Controller - Deleting the stream at API: {}'.format(stream.get('name')))
         if stream is not None:
+            logger.info('Controller - Deleting the stream at API: {}'.format(stream.get('name')))
             self.__try_destroy_stream(amp_api, stream['id'])
             storage.delete_stream()
         output = jsonresponse.JsonResponse()

@@ -3,7 +3,11 @@ import json
 import requests
 import traceback
 
+import os
+import sys
+
 from amp4e_events_input.stream_dict_manager import StreamDictManager
+from splunk.clilib import cli_common as cli
 from logger import logger
 
 
@@ -12,7 +16,6 @@ class ApiService(object):
     STREAMS_ENDPOINT = '/v1/event_streams/'
     EVENT_TYPES_ENDPOINT = '/v1/event_types/'
     GROUPS_ENDPOINT = '/v1/groups/'
-    VERIFY_SSL = False
     HEADERS = {'Accept-Language': 'da, en-gb;q=0.8, en;q=0.7'}
     JSON_HEADERS = {'Content-Type': 'application/json'}
     REQUEST_TIMEOUT = 300
@@ -75,13 +78,42 @@ class ApiService(object):
         return '{}://{}{}{}'.format(self.PROTO, self.host, endpoint, ending)
 
     def __shared_options(self, add_json_headers=False):
-        options = {'auth': (self.api_id, self.api_key), 'verify': self.VERIFY_SSL, 'timeout': self.REQUEST_TIMEOUT}
+        options = {
+            'auth': (self.api_id, self.api_key),
+            'timeout': self.REQUEST_TIMEOUT,
+            'verify': self.__ssl_options(),
+            'proxies': self.__proxy_options()
+        }
         headers = self.HEADERS.copy()
         if add_json_headers:
             headers.update(self.JSON_HEADERS)
         options['headers'] = headers
         return options
 
+    def __proxy_options(self):
+        stanza = self.__get_self_conf_stanza('server.conf', 'proxyConfig')
+        return {
+            'http': stanza.get('http_proxy', os.environ.get('HTTP_PROXY')),
+            'https': stanza.get('https_proxy', os.environ.get('HTTPS_PROXY'))
+        }
+
+    def __ssl_options(self):
+        stanza = self.__get_self_conf_stanza('web.conf', 'settings')
+        return (stanza.get('enableSplunkWebSSL') in ['true', 1] and stanza.get('serverCert')) or os.environ.get('SSL_CERT_FILE', False)
+
+    def __get_self_conf_stanza(self, conf_name, stanza):
+        appdir = os.path.join(sys.prefix, 'etc', 'system')
+        apikeyconfpath = os.path.join(appdir, 'default', conf_name)
+        apikeyconf = cli.readConfFile(apikeyconfpath)
+        localconfpath = os.path.join(appdir, 'local', conf_name)
+        if os.path.exists(localconfpath):
+            localconf = cli.readConfFile(localconfpath)
+            for name, content in localconf.items():
+                if name in apikeyconf:
+                    apikeyconf[name].update(content)
+                else:
+                    apikeyconf[name] = content
+        return apikeyconf.get(stanza, {})
 
 class ApiError(Exception):
     SERVICE_UNAVAILABLE_ERRORS = {
