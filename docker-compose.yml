@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.4'
 services:
   splunk:
     build: .
@@ -14,6 +14,11 @@ services:
     working_dir: /opt/splunk/etc/apps/amp4e_events_input
     entrypoint: /sbin/amp_entrypoint.sh
     command: start-service
+    healthcheck:
+      test: ["CMD", "/opt/splunk/bin/splunk", "status"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
 # Uncomment below for a clean container to use for testing
   # splunk-test:
   #   image: splunk/splunk:7.0.3

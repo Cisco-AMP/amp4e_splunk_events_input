@@ -1,0 +1,38 @@
+language: python
+python:
+  - "2.7"
+env:
+  - DOCKER_COMPOSE_VERSION=1.24.0
+
+services:
+  - docker
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+before_script:
+  - docker -v
+  - docker-compose -v
+  - docker-compose up -d
+  # Wait for containers to be healthy, adapted from https://github.com/sipcapture/homer-docker/blob/master/.travis.yml
+  - >
+    export tries=0;
+    export max_tries=60;
+    while [[ true ]]; do
+      tries=$((tries + 1));
+      echo "waiting for Splunk and helpers to be started... [$tries]";
+      sleep 2;
+      docker-compose exec splunk nc -z localhost 8191;
+      look_exit=$?;
+      if [[ "$look_exit" = "0" ]]; then echo "Container is ready"; break; fi;
+      if [[ "$tries" -ge "$max_tries" ]]; then echo "Container did not become healthy in time"; exit 1; break; fi;
+    done;
+
+script:
+  - docker-compose exec splunk /opt/splunk/bin/splunk cmd python -m unittest discover
+
+after_script:
+  - docker-compose down
