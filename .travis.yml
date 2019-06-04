@@ -25,7 +25,7 @@ before_script:
       tries=$((tries + 1));
       echo "waiting for the Splunk container to be ready... [$tries]";
       sleep 2;
-      grep -q "started" $CONTAINER_ARTIFACT_DIR/splunk-container.state
+      docker-compose exec splunk sh -c 'grep -q "started" $CONTAINER_ARTIFACT_DIR/splunk-container.state'
       look_exit=$?;
       if [[ "$look_exit" = "0" ]]; then echo "Container is ready"; break; fi;
       if [[ "$tries" -ge "$max_tries" ]]; then echo "Container did not become healthy in time"; exit 1; break; fi;
