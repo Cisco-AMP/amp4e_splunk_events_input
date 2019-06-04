@@ -32,7 +32,7 @@ before_script:
     done;
 
 script:
-  - docker-compose exec splunk /opt/splunk/bin/splunk cmd python -m unittest discover
+  - docker-compose exec -u splunk splunk /opt/splunk/bin/splunk cmd python -m unittest discover
 
 after_script:
   - docker-compose down
