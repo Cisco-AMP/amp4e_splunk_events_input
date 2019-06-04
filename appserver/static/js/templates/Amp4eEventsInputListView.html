@@ -75,6 +75,7 @@
                         <td>
                           <% if (inputs[i].deleted) { %>
                             <i class="icon-alert" rel="tooltip" title="This input is not linked to any AMP for Endpoints API event streams. You will not be able to receive any data from it."></i>
+                            &nbsp;
                           <% } %>
                           <a href="<%- inputs[i].href %>"><%- inputs[i].name %></a>
                         </td>
