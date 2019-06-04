@@ -19,6 +19,7 @@ class ApiService(object):
     HEADERS = {'Accept-Language': 'da, en-gb;q=0.8, en;q=0.7'}
     JSON_HEADERS = {'Content-Type': 'application/json'}
     REQUEST_TIMEOUT = 300
+    SSL_CERT_FILE = '/opt/splunk/etc/apps/amp4e_events_input/certs/amp_cisco.crt'
 
     def __init__(self, host, api_id, api_key):
         self.host = host
@@ -98,8 +99,7 @@ class ApiService(object):
         }
 
     def __ssl_options(self):
-        stanza = self.__get_self_conf_stanza('web.conf', 'settings')
-        return (stanza.get('enableSplunkWebSSL') in ['true', 1] and stanza.get('serverCert')) or os.environ.get('SSL_CERT_FILE', False)
+        return os.environ.get('AMP_SSL_CERT_FILE', self.SSL_CERT_FILE)
 
     def __get_self_conf_stanza(self, conf_name, stanza):
         appdir = os.path.join(sys.prefix, 'etc', 'system')
