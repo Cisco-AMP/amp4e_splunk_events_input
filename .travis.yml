@@ -23,16 +23,16 @@ before_script:
     export max_tries=60;
     while [[ true ]]; do
       tries=$((tries + 1));
-      echo "waiting for Splunk and helpers to be started... [$tries]";
+      echo "waiting for the Splunk container to be ready... [$tries]";
       sleep 2;
-      docker-compose exec splunk nc -z localhost 8191;
+      docker-compose exec splunk sh -c 'grep -q "started" $CONTAINER_ARTIFACT_DIR/splunk-container.state'
       look_exit=$?;
       if [[ "$look_exit" = "0" ]]; then echo "Container is ready"; break; fi;
       if [[ "$tries" -ge "$max_tries" ]]; then echo "Container did not become healthy in time"; exit 1; break; fi;
     done;
 
 script:
-  - docker-compose exec splunk /opt/splunk/bin/splunk cmd python -m unittest discover
+  - docker-compose exec -u splunk splunk /opt/splunk/bin/splunk cmd python -m unittest discover
 
 after_script:
   - docker-compose down

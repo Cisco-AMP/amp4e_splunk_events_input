@@ -8,22 +8,19 @@ services:
         target: /opt/splunk/etc/apps/amp4e_events_input
     environment:
       - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=changeme
       - DEBUG=true
     ports:
       - "8000:8000"
     working_dir: /opt/splunk/etc/apps/amp4e_events_input
     entrypoint: /sbin/amp_entrypoint.sh
     command: start-service
-    healthcheck:
-      test: ["CMD", "/opt/splunk/bin/splunk", "status"]
-      interval: 5s
-      retries: 5
-      start_period: 10s
 # Uncomment below for a clean container to use for testing
   # splunk-test:
-  #   image: splunk/splunk:7.0.3
+  #   image: splunk/splunk:latest
   #   environment:
   #     - SPLUNK_START_ARGS=--accept-license
+  #     - SPLUNK_PASSWORD=changeme
   #     - DEBUG=true
   #   ports:
   #     - "8001:8000"
