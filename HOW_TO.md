@@ -1,7 +1,7 @@
 ## Outline code design of the App
 
 * `appserver/controllers/`
-  * `amp_streams_api_controller.py` - main controller
+  * `amp_streams_api_controller.py` - responds to the user input and performs interactions on the API data.
     * `event_streams_list` - fetches all event streams.
     * `save_stream` - creates a new event stream if it doesn’t exist otherwise updates the existing one.
     * `delete_stream` - deletes event stream from the API and deletes input from the Splunk app.
@@ -37,7 +37,7 @@
 * `release/` - classes for creating a package for release on Splunkbase.
 * `tests/` - stored all tests.
 
-## Guide to validate that eventing is working
+## Guide to validate that everything is working
 
   1. Go to New Input page and create input. Name and Stream Name fields are required. Index field - choose in which index would you like the events to appear. Event Types and Groups fields - choose for which event types and groups would you like the events to belong (leave empty to belong for all of them).
 
