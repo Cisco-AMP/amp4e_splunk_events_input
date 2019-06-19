@@ -7,7 +7,7 @@ class AbstractReleaser(object):
     DIRS_TO_ARCHIVE = []
     APP_NAME = ''
     EXCLUDED_FILES = ['local.meta', 'requirements-splunk.txt', '*.pyc', '*.pyo']
-    SPLUNKBASE_README = 'README_sb.md'
+    SPLUNKBASE_README = 'README_SPLUNKBASE.md'
     LICENSE = 'LICENSE'
 
     def __init__(self, app_dir):
@@ -50,4 +50,3 @@ class AbstractReleaser(object):
     def _create_tmp_app_dir(self):
         if not os.path.isdir(self._tmp_app_dir):
             os.makedirs(self._tmp_app_dir)
-
