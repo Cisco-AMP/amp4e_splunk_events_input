@@ -8,7 +8,7 @@ from abstract_releaser import AbstractReleaser
 
 
 class SplunkbaseReleaser(AbstractReleaser):
-    DIRS_TO_ARCHIVE = ['appserver', 'bin', 'default', 'metadata', 'README', 'static']
+    DIRS_TO_ARCHIVE = ['appserver', 'bin', 'certs', 'default', 'metadata', 'README', 'static']
     APP_NAME = 'amp4e_events_input'
     PATH_TO_PYTHON_LIBS = '/opt/splunk/lib/python2.7/site-packages'
     PYTHON_LIBS_TO_ARCHIVE = ['splunklib', 'pika']
