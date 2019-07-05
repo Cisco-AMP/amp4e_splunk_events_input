@@ -95,6 +95,8 @@ Whenever a new release is made, please keep in mind that default/app.conf should
 
 When installing or upgrading the app, Splunk simply copies all the files from the package provided into /`opt/splunk/etc/apps/<your_package_name>`. This means that if a file or folder is deleted in a newer version of the app, when a user upgrades their app, that file will remain. It needs to be called out specifically in the upgrade process documentation that the user will need to delete it from their Splunk server.
 
+If a **new folder is added at the top level of the app**, it's name must be added to `DIRS_TO_ARCHIVE` in `release/util/splunkbase_releaser.py` to be included in the release package.
+
 ### Splunkbase release
 
 Creates a package for release on Splunkbase.
