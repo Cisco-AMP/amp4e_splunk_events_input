@@ -19,7 +19,7 @@ class ApiService(object):
     HEADERS = {'Accept-Language': 'da, en-gb;q=0.8, en;q=0.7'}
     JSON_HEADERS = {'Content-Type': 'application/json'}
     REQUEST_TIMEOUT = 300
-    SSL_CERT_FILE = '/opt/splunk/etc/apps/amp4e_events_input/certs/amp_cisco.crt'
+    SSL_CERT_FILE = os.path.join(os.environ.get('SPLUNK_HOME'), 'etc', 'apps', 'amp4e_events_input', 'certs', 'amp_cisco.crt')
 
     def __init__(self, host, api_id, api_key):
         self.host = host
