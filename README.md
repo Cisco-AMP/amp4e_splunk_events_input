@@ -61,7 +61,7 @@ docker-compose down
 docker-compose up
 ```
 
-* The changes in input app require the Splunk to be restarted. When you have made some changes, restart Splunk: `docker-compose exec splunk /opt/splunk/bin/splunk restart`
+* The changes in input app require the Splunk to be restarted. When you have made some changes, restart Splunk: `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk restart'`
 * Do not push your *local* folder to git repository, as it stores values that belong to your unique Splunk instance.
 * If you need to add a python library dependency - enter its name within the *bin/requirements-splunk.txt* and run `pip install -r bin/requirements-splunk.txt --target=$SPLUNK_HOME/lib/python2.7/site-packages`.
 * By default, Splunk will display 2 info messages about version updates when you reach its dashboard for the first time. If you see other messages (warnings or errors) - you most certainly need to fix your input app to make them disappear.
@@ -70,9 +70,9 @@ docker-compose up
 ## Testing
 
 * Enter your admin credentials in test/support/config.py
-* To execute all tests, `docker-compose exec -u  splunk /opt/splunk/bin/splunk cmd python -m unittest discover`.
+* To execute all tests, `docker-compose exec -u  splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest discover'`.
 * If you'd like to run a single test, refer to it as to a module:
-    `docker-compose exec -u splunk splunk /opt/splunk/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager`
+    `docker-compose exec -u splunk splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager'`
 * When testing upgrading the app, you can uncomment the `splun-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
 
 ## Diag
@@ -95,7 +95,7 @@ Whenever a new release is made, please keep in mind that default/app.conf should
 
 ### Gotchas
 
-When installing or upgrading the app, Splunk simply copies all the files from the package provided into /`opt/splunk/etc/apps/<your_package_name>`. This means that if a file or folder is deleted in a newer version of the app, when a user upgrades their app, that file will remain. It needs to be called out specifically in the upgrade process documentation that the user will need to delete it from their Splunk server.
+When installing or upgrading the app, Splunk simply copies all the files from the package provided into `$SPLUNK_HOME/etc/apps/<your_package_name>`. This means that if a file or folder is deleted in a newer version of the app, when a user upgrades their app, that file will remain. It needs to be called out specifically in the upgrade process documentation that the user will need to delete it from their Splunk server.
 
 If a **new folder is added at the top level of the app**, it's name must be added to `DIRS_TO_ARCHIVE` in `release/util/splunkbase_releaser.py` to be included in the release package.
 
@@ -115,8 +115,8 @@ docker-compose exec splunk sh -c "cd release;fab splunkbase_release"
 ValueError: Expected instance of Parameters, not <URLParameters host=export-streaming.amp.cisco.com port=443 virtual_host=/ ssl=True>
 ```
 
-* This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `/opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
+* This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `$SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
 
     ```bash
-    $ rm -rf /opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika
+    $ rm -rf $SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika
     ```
