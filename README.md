@@ -73,7 +73,7 @@ docker-compose up
 * To execute all tests, `docker-compose exec -u  splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest discover'`.
 * If you'd like to run a single test, refer to it as to a module:
     `docker-compose exec -u splunk splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager'`
-* When testing upgrading the app, you can uncomment the `splun-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
+* When testing upgrading the app, you can uncomment the `splunk-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
 
 ## Diag
 
