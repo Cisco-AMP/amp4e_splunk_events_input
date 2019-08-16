@@ -89,8 +89,8 @@ This project is open-source, please seek guidance at project's [github page](htt
 ValueError: Expected instance of Parameters, not <URLParameters host=export-streaming.amp.cisco.com port=443 virtual_host=/ ssl=True>
 ```
 
-* This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `/opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
+* This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `$SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
 
 ```bash
-$ rm -rf /opt/splunk/etc/apps/amp4e_events_input/bin/pika/pika
+$ rm -rf $SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika
 ```
