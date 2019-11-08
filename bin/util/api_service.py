@@ -6,10 +6,30 @@ import traceback
 import os
 import sys
 
-from amp4e_events_input.stream_dict_manager import StreamDictManager
-from splunk.clilib import cli_common as cli
-from logger import logger
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
+from amp4e_events_input_lib.stream_dict_manager import StreamDictManager
 
+from splunk.clilib import cli_common as cli
+from .logger import logger
+
+def with_validated_response(func):
+    def wrapper(*args, **kwargs):
+        try:
+            response = func(*args, **kwargs)
+            logger.info('Received response from ApiService ({})'.format(response.status_code))
+            status = response.status_code
+            if status in range(200, 399):
+                if len(response.text) > 0:
+                    return response.json()
+            else:
+                raise ApiError(response.text, response.status_code)
+        except requests.exceptions.RequestException as e:
+            logger.error(traceback.format_exc())
+            logger.error(repr(e))
+            raise ApiError('Request failure: {} - {}'.format(e.__class__, repr(e)), 502)
+
+    return wrapper
 
 class ApiService(object):
     PROTO = 'https'
@@ -25,24 +45,6 @@ class ApiService(object):
         self.host = host
         self.api_id = api_id
         self.api_key = api_key
-
-    def with_validated_response(func):
-        def wrapper(*args, **kwargs):
-            try:
-                response = func(*args, **kwargs)
-                logger.info('Received response from ApiService ({})'.format(response.status_code))
-                status = response.status_code
-                if status in range(200, 399):
-                    if len(response.text) > 0:
-                        return response.json()
-                else:
-                    raise ApiError(response.text, response.status_code)
-            except requests.exceptions.RequestException as e:
-                logger.error(traceback.format_exc())
-                logger.error(repr(e))
-                raise ApiError('Request failure: {}'.format(e.__class__, repr(e)), 502)
-
-        return wrapper
 
     @with_validated_response
     def index(self):
@@ -144,10 +146,11 @@ class ApiError(Exception):
                        'happened because the stream has been deleted directly through API. Please contact support.'
 
     def __init__(self, message, status):
-        super(ApiError, self).__init__(message)
+        super().__init__(message)
         logger.error('API Error (status {}): {}'.format(status, message))
         self.status = status
         self.stream_is_not_found = False
+        self.message = message
         self.__set_message()
 
     def __str__(self):

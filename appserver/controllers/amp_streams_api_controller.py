@@ -12,25 +12,25 @@ sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "b
 
 from util.api_service import ApiService, ApiError
 from util.logger import logger
-from amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
-from amp4e_events_input.stream_dict_manager import StreamDictManager
 
+from amp4e_events_input_lib.amp_storage_wrapper import AmpStorageWrapper
+from amp4e_events_input_lib.stream_dict_manager import StreamDictManager
+
+def jsonify_errors(func):
+    @wraps(func)
+    def wrapper(inst, *args, **kwargs):
+        try:
+            return func(inst, *args, **kwargs)
+        except ApiError as e:
+            return inst.__json_error(e.extract_data_from_message())
+        except Exception as e:
+            return inst.__json_error({'error': str(e), 'trace': traceback.format_exc()})
+
+    return wrapper
 
 # When the controller has any kind of runtime error - Splunk will simply ignore it, returning 404.
 # Make sure you have no runtime errors before trying to reach this controller from Splunk Web
 class AmpStreamsApiController(controllers.BaseController):
-    def jsonify_errors(func):
-        @wraps(func)
-        def wrapper(inst, *args, **kwargs):
-            try:
-                return func(inst, *args, **kwargs)
-            except ApiError as e:
-                return inst.__json_error(e.extract_data_from_message())
-            except Exception as e:
-                return inst.__json_error({'error': str(e), 'trace': traceback.format_exc()})
-
-        return wrapper
-
     @jsonify_errors
     @expose_page(must_login=True, methods=['GET'])
     def event_streams_list(self, **kwargs):
