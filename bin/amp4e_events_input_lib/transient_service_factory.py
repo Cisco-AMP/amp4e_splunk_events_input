@@ -1,4 +1,7 @@
-from urlparse import urlsplit
+try:
+    from urllib.parse import urlsplit
+except ImportError:
+     from urlparse import urlsplit
 
 from splunklib.client import Service
 
