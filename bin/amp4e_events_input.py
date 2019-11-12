@@ -43,7 +43,6 @@ class Amp4eEventsInput(Script):
     # If stream doesn't exist yet, exits.
     # Otherwise, fetches all events from queue and writes them to logs.
     def stream_events(self, inputs, ew):
-        logger.info('In stream_events')
         for input_name, _ in inputs.inputs.items():
             logger.debug('Starting input ' + input_name)
             inputs.metadata['name'] = input_name.split('://', 1)[-1]
