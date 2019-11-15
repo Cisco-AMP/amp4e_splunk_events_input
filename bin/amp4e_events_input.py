@@ -5,7 +5,7 @@ import json
 
 from splunklib.modularinput import Argument, Event, Scheme, Script
 
-from amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
+from amp4e_events_input_lib.amp_storage_wrapper import AmpStorageWrapper
 from util.logger import logger
 from util.stream_consumer import StreamConsumer
 
