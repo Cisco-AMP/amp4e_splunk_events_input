@@ -25,7 +25,6 @@ class StreamConsumer(object):
 
     def run(self):
         try:
-            logger.debug('Connecting to {}'.format(self._url))
             self._connection = pika.BlockingConnection(pika.URLParameters(self._url))
             self.start_consuming()
         except (AMQPChannelError, ConnectionClosed, NoFreeChannels) as e:

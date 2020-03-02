@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        messages: "../app/amp4e_events_input/js/lib/message_service"
+        messages: "../app/amp4e_events_input/js/lib/message_service",
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -16,6 +17,7 @@ define([
     "text!../app/amp4e_events_input/js/templates/Amp4eEventsInputListView.html",
     "util/splunkd_utils",
     "messages",
+    "api_credentials",
     "css!../app/amp4e_events_input/css/Amp4eEventsInputListView.css"
 ], function(
     _,
@@ -27,7 +29,8 @@ define([
     SimpleSplunkView,
     Template,
     splunkd_utils,
-    messageService
+    messageService,
+    apiCredentialsService
 ){
 
     var Amp4eEventsInputConfiguration = SplunkDBaseModel.extend({
@@ -95,9 +98,22 @@ define([
                 url: '/splunkd/__raw/services/configs/conf-inputs/amp4e_events_input',
                 success: function (model, _response, _options) {
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
+
+                    // migrate to new secure format for api key if an api key exists in unsecure format
+                    apiKey = model.entry.content.attributes.api_key;
+                    apiId = model.entry.content.attributes.api_id;
+                    if (apiKey && apiKey.length > 0) {
+                        // save and encrypt api key
+                        apiCredentialsService.saveAPIKey(apiId, apiKey);
+
+                        // remove plain text api key
+                        this.ampInputConfiguration.entry.content.attributes.api_key = null;
+                        this.ampInputConfiguration.save();
+                    }
+
                     this.apiHost = model.entry.content.attributes.api_host;
-                    this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = model.entry.content.attributes.api_key;
+                    this.apiId = apiId;
+                    this.apiKey = apiCredentialsService.fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         $('#error-message').show();
@@ -389,12 +405,13 @@ define([
         },
 
         deleteWithAPI: function(params, endpoint) {
+            apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
             return $.ajax({
                 url: splunkd_utils.fullpath("/custom/amp4e_events_input/amp_streams_api_controller/" + endpoint + "?" +
                     $.param(Object.assign({
                         api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
-                        api_id: this.ampInputConfiguration.entry.content.attributes.api_id,
-                        api_key: this.ampInputConfiguration.entry.content.attributes.api_key
+                        api_id: apiId,
+                        api_key: apiCredentialsService.fetchAPIKey(apiId)
                     }, params))
                 ),
                 type: 'DELETE'
@@ -540,6 +557,7 @@ define([
             }
 
         }
+
     });
 
     return Amp4eEventsInputListView;

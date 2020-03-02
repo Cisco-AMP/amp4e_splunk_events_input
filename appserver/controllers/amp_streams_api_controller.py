@@ -12,9 +12,9 @@ sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "b
 
 from util.api_service import ApiService, ApiError
 from util.logger import logger
-
-from amp4e_events_input_lib.amp_storage_wrapper import AmpStorageWrapper
-from amp4e_events_input_lib.stream_dict_manager import StreamDictManager
+from amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
+from amp4e_events_input.stream_dict_manager import StreamDictManager
+import splunklib.client as client
 
 # When the controller has any kind of runtime error - Splunk will simply ignore it, returning 404.
 # Make sure you have no runtime errors before trying to reach this controller from Splunk Web
@@ -99,6 +99,32 @@ class AmpStreamsApiController(controllers.BaseController):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         response = amp_api.groups()
         return self.render_json(response['data'])
+
+    @jsonify_errors
+    @expose_page(must_login=True, methods=['POST'])
+    def save_api_key(self, **kwargs):
+        session_key = cherrypy.session.get('sessionKey')
+        service = client.connect(token=session_key)
+        service.storage_passwords.create(kwargs['api_key'], kwargs['api_id'])
+        output = jsonresponse.JsonResponse()
+        output.success = True
+        return self.render_json(output)
+
+    @jsonify_errors
+    @expose_page(must_login=True, methods=['GET'])
+    def fetch_api_key(self, **kwargs):
+        session_key = cherrypy.session.get('sessionKey')
+        service = client.connect(token=session_key)
+        storage_passwords = service.storage_passwords
+        api_key = None
+        for storage_password in storage_passwords:
+            if kwargs['api_id'] in storage_password.name:
+                api_key = storage_password.clear_password
+                break
+        output = jsonresponse.JsonResponse()
+        output.success = True
+        output.api_key = api_key
+        return self.render_json(output)
 
     def __json_error(self, payload):
         output = jsonresponse.JsonResponse()

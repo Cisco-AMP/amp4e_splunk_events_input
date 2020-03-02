@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        setup_view: '../app/amp4e_events_input/js/views/SetupView'
+        setup_view: '../app/amp4e_events_input/js/views/SetupView',
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -11,6 +12,7 @@ define([
     "models/SplunkDBase",
     "collections/SplunkDsBase",
     "setup_view",
+    "api_credentials",
     "util/splunkd_utils",
     "text!../app/amp4e_events_input/js/templates/Amp4eEventsInputCreateView.html",
     "css!../app/amp4e_events_input/css/Amp4eEventsInputCreateView.css"
@@ -20,6 +22,7 @@ define([
     SplunkDBaseModel,
     SplunkDsBaseCollection,
     SetupView,
+    apiCredentialsService,
     splunkd_utils,
     Template
 ){
@@ -65,7 +68,7 @@ define([
 
             this.apiHost = null;
             this.apiId = null;
-            this.apiKey = null;
+
             this.ampInputConfiguration = null;
             this.ampInput = null;
             this.eventsGroups = {};
@@ -161,7 +164,7 @@ define([
         saveWithAPI: function() {
             $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/save_stream"),
-                data: this.getStreamOptions(),
+                data: this.getStreamOptions(true),
                 type: 'POST',
                 success: function (data) {
                     if (data.success) {
@@ -193,7 +196,7 @@ define([
         saveInput: function() {
             $.ajax({
                 url: splunkd_utils.fullpath(['/servicesNS/admin/amp4e_events_input/data/inputs/amp4e_events_input', encodeURIComponent(this.getInputName())].join('/')),
-                data: this.isUpdatePage ? this.getStreamUpdateOptions() : this.getStreamOptions(),
+                data: this.isUpdatePage ? this.getStreamUpdateOptions(false) : this.getStreamOptions(false),
                 type: 'POST',
                 success: function(resp) {
                     if (this.isUpdatePage) {
@@ -221,14 +224,14 @@ define([
             return (selected_ids || []).map(item => this.eventsGroups[item]).join('---');
         },
 
-        getStreamOptions: function() {
+        getStreamOptions: function(includeAPIKey) {
             return Object.assign({
                 name: this.getInputName(),
                 index: this.getInputIndex()
-            }, this.getStreamUpdateOptions());
+            }, this.getStreamUpdateOptions(includeAPIKey));
         },
 
-        getStreamUpdateOptions: function() {
+        getStreamUpdateOptions: function(includeAPIKey) {
             var event_types = this.getStreamEventTypes();
             var groups = this.getStreamGroups();
 
@@ -238,14 +241,38 @@ define([
                 groups: Array(groups).join(','),
                 event_types_names: this.getEventsGroupsNames(event_types),
                 groups_names: this.getEventsGroupsNames(groups)
-            }, this.getAPIOptions());
+            }, this.getAPIOptions(includeAPIKey));
         },
 
-        getAPIOptions: function() {
-            return {
-                api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
-                api_id: this.ampInputConfiguration.entry.content.attributes.api_id,
-                api_key: this.ampInputConfiguration.entry.content.attributes.api_key
+        getAPIOptions: function(includeAPIKey) {
+            apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
+            apiHost = this.ampInputConfiguration.entry.content.attributes.api_host;
+
+            // migrate to new secure format for api key if an api key exists in unsecure format
+            // to blank out api key, we must set it to null
+            apiKey = this.ampInput.content.api_key;
+            if (apiKey && apiKey.length > 0 && includeAPIKey == false) {
+                return {
+                    api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
+                    api_id: apiId,
+                    api_key: null
+                }
+            }
+
+            if (includeAPIKey) {
+                // for creating or updating the stream
+                return {
+                    api_host: apiHost,
+                    api_id: apiId,
+                    api_key: apiCredentialsService.fetchAPIKey(apiId)
+                }
+            } else {
+                // for creating the input
+                // new format without api key
+                return {
+                    api_host: apiHost,
+                    api_id: apiId
+                }
             }
         },
 
@@ -285,9 +312,8 @@ define([
                 success: function (model, _response, _options) {
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = model.entry.content.attributes.api_key;
 
-                    if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
+                    if (![this.apiHost, this.apiId, apiCredentialsService.fetchAPIKey(this.apiId)].every(el => el)) {
                         this.showErrorMessage('.empty-conf');
                         return false;
                     }
@@ -312,10 +338,9 @@ define([
 
         initSelectTag: function(obj, endpoint, selected_array = []) {
             var $element = obj.select2();
-
             var $request = $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/" + endpoint),
-                data: this.getAPIOptions(),
+                data: this.getAPIOptions(true)
             });
 
             var _this = this;

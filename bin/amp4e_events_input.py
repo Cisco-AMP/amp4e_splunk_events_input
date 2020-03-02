@@ -18,7 +18,7 @@ class Amp4eEventsInput(Script):
         'groups': ['Enter group guids for the stream', False, False],
         'api_host': ['AMP for Endpoints API host', True, True],
         'api_id': ['3rd Party API Client ID provided by AMP for Endpoints', True, True],
-        'api_key': ['API secret', True, True],
+        'api_key': ['API secret', False, False],
         'event_types_names': ['Event types names', True, True],
         'groups_names': ['Groups names', False, False]
     }

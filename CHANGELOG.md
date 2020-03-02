@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.1.8
+- Converts api key from unsecured to secured using splunk's storage passwords API
+- Creating a new input configuration and stream will not save the api key in your input.conf file
+- To migrate your existing app, go to the app's main page, click and edit your linked stream and click Save
+- After you migrate your app, the api key is removed from all your input stanzas in your input.conf file
+
 ### 1.1.4
 - Fix https://github.com/Cisco-AMP/amp4e_splunk_events_input/issues/10
 
