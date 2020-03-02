@@ -97,7 +97,8 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = model.entry.content.attributes.api_key;
+                    // use api id as the key to the api key encrypted credential
+                    this.apiKey = this.getEncryptedCredential(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         $('#error-message').show();

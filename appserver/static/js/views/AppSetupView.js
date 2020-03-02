@@ -55,7 +55,6 @@ define([
         updateModel: function(){
             this.ampInputConfiguration.entry.content.attributes.api_host = this.getApiHost();
             this.ampInputConfiguration.entry.content.attributes.api_id = this.getApiId();
-            this.ampInputConfiguration.entry.content.attributes.api_key = this.getApiKey();
         },
 
         saveConfig: function(){
@@ -70,7 +69,9 @@ define([
                 this.showFormInProgress(true);
 
                 $.when(
-                    this.ampInputConfiguration.save()
+                    this.ampInputConfiguration.save(),
+                    // use api id as the key to the api key encrypted credential
+                    this.saveEncryptedCredential(this.getApiId(),this.getApiKey())
                 )
                 // If successful, show a success message
                 .then(function(){
@@ -136,7 +137,8 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.setApiHost(model.entry.content.attributes.api_host);
                     this.setApiId(model.entry.content.attributes.api_id);
-                    this.setApiKey(model.entry.content.attributes.api_key);
+                    // use api id as the key to the api key encrypted credential
+                    this.setApiKey(this.getEncryptedCredential(this.getApiId()));
                 }.bind(this),
                 error: function () {
                     console.warn("Unsuccessfully retrieved the default amp4e_events_input configuration");
