@@ -99,21 +99,6 @@ define([
 	    }
 	});
 
-    var EncryptedCredential = SplunkDBaseModel.extend({
-        url: "storage/passwords",
-	    initialize: function() {
-	    	SplunkDBaseModel.prototype.initialize.apply(this, arguments);
-	    }
-	});
-
-	var EncryptedCredentials = SplunkDsBaseCollection.extend({
-	    url: "storage/passwords",
-        model: EncryptedCredential,
-	    initialize: function() {
-	      SplunkDsBaseCollection.prototype.initialize.apply(this, arguments);
-	    }
-	});
-
     return ValidationView.extend({
         className: "SetupView",
 
@@ -153,16 +138,12 @@ define([
             this.is_app_configured = null;
 
             this.app_config = null;
-            this.encrypted_credential = null;
 
             this.capabilities = null;
             this.is_using_free_license = $C.SPLUNKD_FREE_LICENSE;
 
             // Start the process of the getting the app.conf settings
             this.getAppConfig();
-
-            // This stores a list of existing credentials
-            this.credentials = null;
 
             this.setupProperties();
         },
@@ -192,28 +173,9 @@ define([
         },
 
         /**
-         * Escape the colons. This is necessary for secure password stanzas.
+         * Capitalize the first letter of the string.
          */
-        escapeColons: function(str){
-            return str.replace(":", "\\:");
-        },
-
-        /**
-         * Make the stanza name for a entry in the storage/passwords endpoint from the username and realm.
-         */
-        makeStorageEndpointStanza: function(username, realm){
-
-            if(this.isEmpty(realm)){
-                realm = "";
-            }
-
-            return this.escapeColons(realm) + ":" + this.escapeColons(username) + ":";
-        },
-
-        /**
-         * Capitolize the first letter of the string.
-         */
-        capitolizeFirstLetter: function (string){
+        capitalizeFirstLetter: function (string){
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
 
@@ -222,8 +184,8 @@ define([
          */
         setupProperty: function(propertyName, selector){
 
-            var setterName = 'set' + this.capitolizeFirstLetter(propertyName);
-            var getterName = 'get' + this.capitolizeFirstLetter(propertyName);
+            var setterName = 'set' + this.capitalizeFirstLetter(propertyName);
+            var getterName = 'get' + this.capitalizeFirstLetter(propertyName);
 
             if(this[setterName] === undefined){
                 this[setterName] = function(value){
@@ -245,98 +207,6 @@ define([
             for(var name in this.formProperties){
                 this.setupProperty(name, this.formProperties[name]);
             }
-        },
-
-        /**
-         * Get the encrypted credential by realm.
-         */
-        getEncryptedCredentialByRealm: function(realm, returnAll){
-
-            if(typeof returnAll === "undefined"){
-                returnAll = false;
-            }
-
-            // Get a promise ready
-            var promise = jQuery.Deferred();
-
-            // Get the credentials
-        	credentials = new EncryptedCredentials();
-
-            credentials.fetch({
-                success: function (credentials) {
-                    console.info("Successfully retrieved the list of credentials");
-
-                    // Find the credential(s) with the realm
-                    var credentialModels = credentials.models[c].filter(function (entry) {
-                        return credentials.models[c].entry.content.attributes.realm === realm;
-                    });
-
-                    // Return all of them if requested
-                    if (returnAll) {
-                        promise.resolve(credentialModels);
-                    }
-
-                    // Return the first if they only wanted one
-                    else if (credentialModels.length > 0) {
-                        promise.resolve(credentialModels[0]);
-                    }
-
-                    // We found none, return null
-                    else {
-                        promise.resolve(null);
-                    }
-                },
-                error: function () {
-                    console.error("Unable to fetch the credential");
-                    promise.reject();
-                }
-            });
-
-            return promise;
-        },
-
-        /**
-         * Get the encrypted credential.
-         */
-        getEncryptedCredential: function(stanza, ignoreNotFound){
-
-            if(typeof ignoreNotFound === "undefined"){
-                ignoreNotFound = false;
-            }
-
-            // Get a promise ready
-        	var promise = jQuery.Deferred();
-
-            // Make an instance to fetch into
-	        this.encrypted_credential = new EncryptedCredential();
-
-            // Fetch it
-            this.encrypted_credential.fetch({
-                url: splunkd_utils.fullpath('/services/storage/passwords/' + encodeURIComponent(stanza)),
-                success: function (model, response, options) {
-                    console.info("Successfully retrieved the encrypted credential");
-                    promise.resolve(model);
-                }.bind(this),
-                error: function () {
-                    if(ignoreNotFound){
-                        promise.resolve(null);
-                    }
-                    else{
-                        console.warn("Unable to retrieve the encrypted credential");
-                        promise.reject();
-                    }
-                }.bind(this)
-            });
-
-            // Return the promise so that the caller can respond
-            return promise;
-        },
-
-        /**
-         * This is called when a credential was successfully saved.
-         */
-        credentialSuccessfullySaved: function(created_new_entry){
-            // Fill this in when sub-classing
         },
 
         /**
@@ -375,159 +245,6 @@ define([
             }
 
             return false;
-        },
-
-        /**
-         * Delete the encrypted credential. This will create a new encrypted credential if it doesn't exist.
-         *
-         * If it does exist, it will modify the existing credential.
-         */
-        deleteEncryptedCredential: function(stanza, ignoreNotFound){
-
-            if(typeof ignoreNotFound === "undefined"){
-                ignoreNotFound = false;
-            }
-
-            // Get a promise ready
-            var promise = jQuery.Deferred();
-
-            // See if the credential already exists and delete.
-            $.when(this.getEncryptedCredential(stanza)).done(
-
-                // Delete the entry
-                function(credentialModel){
-                    credentialModel.destroy().done(function(){
-                        promise.resolve();
-                    }.bind(this));
-                }.bind(this)
-            )
-            .fail(
-                function(){
-                    if(ignoreNotFound){
-                        promise.resolve();
-                    }
-                    else{
-                        promise.reject();
-                    }
-                }.bind(this)
-            );
-
-            return promise;
-
-        },
-
-        /**
-         * Save the encrypted credential. This will create a new encrypted credential if it doesn't exist.
-         *
-         * If it does exist, it will modify the existing credential.
-         */
-        saveEncryptedCredential: function(username, password, realm){
-
-            // Get a promise ready
-            var promise = jQuery.Deferred();
-
-            // Verify the username
-            if(this.isEmpty(username)){
-                alert("The username field cannot be empty");
-                promise.reject("The username field cannot be empty");
-                return promise;
-            }
-
-            // Verify the password
-            if(this.isEmpty(password, true)){
-                alert("The password field cannot be empty");
-                promise.reject("The password field cannot be empty");
-                return promise;
-            }
-
-            // Create a reference to the stanza name so that we can find if a credential already exists
-            var stanza = this.makeStorageEndpointStanza(username, realm);
-
-            // See if the credential already exists and edit it instead.
-            $.when(this.getEncryptedCredential(stanza)).done(
-
-                // Save changes to the existing credential
-                function(credentialModel){
-
-                    // Save changes to the existing entry
-                    $.when(this.postEncryptedCredential(credentialModel, username, password, realm)).done(function(){
-                        // Run the function that happens when a credential was saved
-                        this.credentialSuccessfullySaved(false);
-                        promise.resolve();
-                    }.bind(this));
-
-
-                }.bind(this)
-            )
-            .fail(
-                function(){
-
-                    // Make a new credential instance
-                    credentialModel = new EncryptedCredential({
-                        user: 'nobody',
-                        app: this.getAppName()
-                    });
-
-                    // Save it
-                    $.when(this.postEncryptedCredential(credentialModel, username, password, realm)).done(function(){
-                        // Run the function that happens when a credential was saved
-                        this.credentialSuccessfullySaved(true);
-                        promise.resolve();
-                    }.bind(this));
-
-                }.bind(this)
-            );
-
-            return promise;
-
-        },
-
-        /**
-         * Save the encrypted crendential.
-         */
-        postEncryptedCredential: function(credentialModel, username, password, realm){
-
-            // Get a promise ready
-        	var promise = jQuery.Deferred();
-
-            // Use the current app if the app name is not defined
-            if(this.app_name === null){
-                this.app_name = mvc_utils.getCurrentApp();
-            }
-
-            // Modify the model
-            credentialModel.entry.content.set({
-                name: username,
-                password: password,
-                username: username,
-                realm: realm
-            }, {
-                silent: true
-            });
-
-            // Kick off the request to edit the entry
-            var saveResponse = credentialModel.save();
-
-            // Wire up a response to tell the user if this was a success
-            if (saveResponse) {
-
-                // If successful, show a success message
-                saveResponse.done(function(model, response, options){
-                    console.info("Credential was successfully saved");
-
-                    promise.resolve(model, response, options);
-                }.bind(this))
-
-                // Otherwise, show a failure message
-                .fail(function(response){
-                    console.warn("Credential was not successfully updated");
-
-                    promise.reject(response);
-                }.bind(this));
-            }
-
-            // Return the promise
-            return promise;
         },
 
         /**
@@ -617,6 +334,26 @@ define([
          */
         userHasAdminAllObjects: function(){
             return this.hasCapability('admin_all_objects');
+        },
+
+        /**
+         * Decrypt and fetch the api key. API Id is the key used to fetch the api key.
+         */
+        fetchAPIKey: function(apiId) {
+            $.ajax({
+                url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/fetch_api_key"),
+                data: {api_id: apiId},
+                type: 'POST',
+                success: function (data) {
+                    return data;
+                }.bind(this),
+                error: function (err) {
+                    this.showWarningMessage("fetch_api_key error" + JSON.stringify(err));
+                    this.showFormInProgress(false);
+                }.bind(this)
+            });
+
+            return "";
         }
     });
 });

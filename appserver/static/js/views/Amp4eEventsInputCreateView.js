@@ -242,10 +242,11 @@ define([
         },
 
         getAPIOptions: function() {
+            api_id = this.ampInputConfiguration.entry.content.attributes.api_id;
             return {
                 api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
-                api_id: this.ampInputConfiguration.entry.content.attributes.api_id,
-                api_key: this.ampInputConfiguration.entry.content.attributes.api_key
+                api_id: api_id,
+                api_key: this.fetchAPIKey(api_id)
             }
         },
 
@@ -285,8 +286,7 @@ define([
                 success: function (model, _response, _options) {
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    // use api id as the key to the api key encrypted credential
-                    this.apiKey = this.getEncryptedCredential(this.apiId);
+                    this.apiKey = fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         this.showErrorMessage('.empty-conf');

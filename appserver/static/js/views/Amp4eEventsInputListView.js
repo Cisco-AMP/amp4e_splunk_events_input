@@ -97,8 +97,7 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    // use api id as the key to the api key encrypted credential
-                    this.apiKey = this.getEncryptedCredential(this.apiId);
+                    this.apiKey = this.fetchAPIKey(this.apiId)
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         $('#error-message').show();
@@ -390,12 +389,13 @@ define([
         },
 
         deleteWithAPI: function(params, endpoint) {
+            apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
             return $.ajax({
                 url: splunkd_utils.fullpath("/custom/amp4e_events_input/amp_streams_api_controller/" + endpoint + "?" +
                     $.param(Object.assign({
                         api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
-                        api_id: this.ampInputConfiguration.entry.content.attributes.api_id,
-                        api_key: this.ampInputConfiguration.entry.content.attributes.api_key
+                        api_id: apiId,
+                        api_key: fetchAPIKey(apiId)
                     }, params))
                 ),
                 type: 'DELETE'
