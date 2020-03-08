@@ -136,7 +136,7 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.setApiHost(model.entry.content.attributes.api_host);
                     this.setApiId(model.entry.content.attributes.api_id);
-                    this.setApiKey(fetchAPIKey(this.getApiId()));
+                    this.setApiKey(this.fetchAPIKey(this.getApiId()));
                 }.bind(this),
                 error: function () {
                     console.warn("Unsuccessfully retrieved the default amp4e_events_input configuration");
