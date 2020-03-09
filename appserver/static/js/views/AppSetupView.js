@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        setup_view: '../app/amp4e_events_input/js/views/SetupView'
+        setup_view: '../app/amp4e_events_input/js/views/SetupView',
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -10,6 +11,7 @@ define([
     "jquery",
     "models/SplunkDBase",
     "setup_view",
+    "api_credentials",
     "util/splunkd_utils",
     "text!../app/amp4e_events_input/js/templates/AppSetupView.html"
 ], function(
@@ -17,6 +19,7 @@ define([
     $,
     SplunkDBaseModel,
     SetupView,
+    apiCredentialsService,
     splunkd_utils,
     Template
 ){
@@ -70,7 +73,7 @@ define([
 
                 $.when(
                     this.ampInputConfiguration.save(),
-                    this.saveAPIKey()
+                    apiCredentialsService.saveAPIKey(this.getApiId(), this.getApiKey())
                 )
                 // If successful, show a success message
                 .then(function(){
@@ -136,7 +139,7 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.setApiHost(model.entry.content.attributes.api_host);
                     this.setApiId(model.entry.content.attributes.api_id);
-                    this.setApiKey(this.fetchAPIKey(this.getApiId()));
+                    this.setApiKey(apiCredentialsService.fetchAPIKey(this.getApiId()));
                 }.bind(this),
                 error: function () {
                     console.warn("Unsuccessfully retrieved the default amp4e_events_input configuration");
@@ -178,26 +181,6 @@ define([
                 "Is required");
             this.addValidator('.api_key', this.getApiKey.bind(this), function(value) { return !!value; },
                 "Is required");
-        },
-
-        /**
-         * Encrypt and save the api key
-         */
-        saveAPIKey: function() {
-            $.ajax({
-                url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/save_api_key"),
-                data: { api_id: this.getApiId(), api_key: this.getApiKey() },
-                type: 'POST',
-                success: function (data) {
-                    return true;
-                }.bind(this),
-                error: function (err) {
-                    this.showWarningMessage("save_api_key error" + JSON.stringify(err));
-                    this.showFormInProgress(false);
-                }.bind(this)
-            });
-
-            return false;
         }
 
     });

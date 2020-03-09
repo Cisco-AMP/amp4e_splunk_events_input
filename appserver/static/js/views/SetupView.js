@@ -334,42 +334,7 @@ define([
          */
         userHasAdminAllObjects: function(){
             return this.hasCapability('admin_all_objects');
-        },
-
-        /**
-         * Decrypt and fetch the api key. API Id is the key used to fetch the api key.
-         */
-        fetchAPIKey: function(apiId) {
-            var result="";
-            $.ajax({
-                url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/fetch_api_key"),
-                data: { api_id: apiId },
-                type: 'POST',
-                async: false,
-                success: function (data) {
-                    if (data.success) {
-                        result = data.api_key;
-                    } else {
-                        this.showFormInProgress(false);
-                        var error = JSON.stringify(data);
-                        if (data.error) {
-                            if (data.error instanceof Array) {
-                                error = data.error.map(err => err.details.join('<br/>')).join('<br/>');
-                            } else {
-                                error = JSON.stringify(error);
-                            }
-                        }
-
-                        this.showWarningMessage("<b>Input could not be saved:</b><br/> " + error);
-                    }
-                }.bind(this),
-                error: function (err) {
-                    this.showWarningMessage("fetch_api_key error" + JSON.stringify(err));
-                    this.showFormInProgress(false);
-                }.bind(this)
-            });
-
-            return result;
         }
+
     });
 });

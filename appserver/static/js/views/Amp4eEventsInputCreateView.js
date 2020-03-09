@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        setup_view: '../app/amp4e_events_input/js/views/SetupView'
+        setup_view: '../app/amp4e_events_input/js/views/SetupView',
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -11,6 +12,7 @@ define([
     "models/SplunkDBase",
     "collections/SplunkDsBase",
     "setup_view",
+    "api_credentials",
     "util/splunkd_utils",
     "text!../app/amp4e_events_input/js/templates/Amp4eEventsInputCreateView.html",
     "css!../app/amp4e_events_input/css/Amp4eEventsInputCreateView.css"
@@ -20,6 +22,7 @@ define([
     SplunkDBaseModel,
     SplunkDsBaseCollection,
     SetupView,
+    apiCredentialsService,
     splunkd_utils,
     Template
 ){
@@ -246,7 +249,7 @@ define([
             return {
                 api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
                 api_id: api_id,
-                api_key: this.fetchAPIKey(api_id)
+                api_key: apiCredentialsService.fetchAPIKey(api_id)
             }
         },
 
@@ -286,7 +289,7 @@ define([
                 success: function (model, _response, _options) {
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = this.fetchAPIKey(this.apiId);
+                    this.apiKey = apiCredentialsService.fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         this.showErrorMessage('.empty-conf');

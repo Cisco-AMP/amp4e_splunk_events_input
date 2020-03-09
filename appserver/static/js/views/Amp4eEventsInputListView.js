@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        messages: "../app/amp4e_events_input/js/lib/message_service"
+        messages: "../app/amp4e_events_input/js/lib/message_service",
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -16,6 +17,7 @@ define([
     "text!../app/amp4e_events_input/js/templates/Amp4eEventsInputListView.html",
     "util/splunkd_utils",
     "messages",
+    "api_credentials",
     "css!../app/amp4e_events_input/css/Amp4eEventsInputListView.css"
 ], function(
     _,
@@ -27,7 +29,8 @@ define([
     SimpleSplunkView,
     Template,
     splunkd_utils,
-    messageService
+    messageService,
+    apiCredentialsService
 ){
 
     var Amp4eEventsInputConfiguration = SplunkDBaseModel.extend({
@@ -97,7 +100,7 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = this.fetchAPIKey(this.apiId);
+                    this.apiKey = apiCredentialsService.fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         $('#error-message').show();
@@ -395,7 +398,7 @@ define([
                     $.param(Object.assign({
                         api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
                         api_id: apiId,
-                        api_key: this.fetchAPIKey(apiId)
+                        api_key: apiCredentialsService.fetchAPIKey(apiId)
                     }, params))
                 ),
                 type: 'DELETE'
@@ -540,43 +543,8 @@ define([
                 $(this.$el).prepend(html);
             }
 
-        },
-
-        /**
-         * Decrypt and fetch the api key. API Id is the key used to fetch the api key.
-         */
-        fetchAPIKey: function(apiId) {
-            var result="";
-            $.ajax({
-                url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/fetch_api_key"),
-                data: { api_id: apiId },
-                type: 'POST',
-                async: false,
-                success: function (data) {
-                    if (data.success) {
-                        result = data.api_key;
-                    } else {
-                        this.showFormInProgress(false);
-                        var error = JSON.stringify(data);
-                        if (data.error) {
-                            if (data.error instanceof Array) {
-                                error = data.error.map(err => err.details.join('<br/>')).join('<br/>');
-                            } else {
-                                error = JSON.stringify(error);
-                            }
-                        }
-
-                        this.showWarningMessage("<b>Input could not be saved:</b><br/> " + error);
-                    }
-                }.bind(this),
-                error: function (err) {
-                    this.showWarningMessage("fetch_api_key error" + JSON.stringify(err));
-                    this.showFormInProgress(false);
-                }.bind(this)
-            });
-
-            return result;
         }
+
     });
 
     return Amp4eEventsInputListView;
