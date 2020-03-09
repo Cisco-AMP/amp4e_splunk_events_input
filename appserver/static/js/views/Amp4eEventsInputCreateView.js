@@ -286,7 +286,7 @@ define([
                 success: function (model, _response, _options) {
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = fetchAPIKey(this.apiId);
+                    this.apiKey = this.fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         this.showErrorMessage('.empty-conf');

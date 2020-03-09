@@ -97,7 +97,7 @@ define([
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = this.fetchAPIKey(this.apiId)
+                    this.apiKey = this.fetchAPIKey(this.apiId);
 
                     if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
                         $('#error-message').show();
@@ -395,7 +395,7 @@ define([
                     $.param(Object.assign({
                         api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
                         api_id: apiId,
-                        api_key: fetchAPIKey(apiId)
+                        api_key: this.fetchAPIKey(apiId)
                     }, params))
                 ),
                 type: 'DELETE'
