@@ -109,7 +109,7 @@ class AmpStreamsApiController(controllers.BaseController):
         return self.render_json(output)
 
     @jsonify_errors
-    @expose_page(must_login=True, methods=['POST'])
+    @expose_page(must_login=True, methods=['GET'])
     def fetch_api_key(self, **kwargs):
         session_key = cherrypy.session.get('sessionKey')
         service = client.connect(token=session_key)

@@ -24,7 +24,7 @@ define([], function() {
             $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/fetch_api_key"),
                 data: { api_id: apiId },
-                type: 'POST',
+                type: 'GET',
                 async: false,
                 success: function (data) {
                     if (data.success) {
