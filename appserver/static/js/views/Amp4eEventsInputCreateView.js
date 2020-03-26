@@ -68,7 +68,7 @@ define([
 
             this.apiHost = null;
             this.apiId = null;
-            this.apiKey = null;
+
             this.ampInputConfiguration = null;
             this.ampInput = null;
             this.eventsGroups = {};
@@ -164,7 +164,7 @@ define([
         saveWithAPI: function() {
             $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/save_stream"),
-                data: this.getStreamOptions(),
+                data: this.getStreamOptions(true),
                 type: 'POST',
                 success: function (data) {
                     if (data.success) {
@@ -196,7 +196,7 @@ define([
         saveInput: function() {
             $.ajax({
                 url: splunkd_utils.fullpath(['/servicesNS/admin/amp4e_events_input/data/inputs/amp4e_events_input', encodeURIComponent(this.getInputName())].join('/')),
-                data: this.isUpdatePage ? this.getStreamUpdateOptions() : this.getStreamOptions(),
+                data: this.isUpdatePage ? this.getStreamUpdateOptions(false) : this.getStreamOptions(false),
                 type: 'POST',
                 success: function(resp) {
                     if (this.isUpdatePage) {
@@ -224,14 +224,14 @@ define([
             return (selected_ids || []).map(item => this.eventsGroups[item]).join('---');
         },
 
-        getStreamOptions: function() {
+        getStreamOptions: function(includeAPIKey) {
             return Object.assign({
                 name: this.getInputName(),
                 index: this.getInputIndex()
-            }, this.getStreamUpdateOptions());
+            }, this.getStreamUpdateOptions(includeAPIKey));
         },
 
-        getStreamUpdateOptions: function() {
+        getStreamUpdateOptions: function(includeAPIKey) {
             var event_types = this.getStreamEventTypes();
             var groups = this.getStreamGroups();
 
@@ -241,15 +241,25 @@ define([
                 groups: Array(groups).join(','),
                 event_types_names: this.getEventsGroupsNames(event_types),
                 groups_names: this.getEventsGroupsNames(groups)
-            }, this.getAPIOptions());
+            }, this.getAPIOptions(includeAPIKey));
         },
 
-        getAPIOptions: function() {
-            api_id = this.ampInputConfiguration.entry.content.attributes.api_id;
-            return {
-                api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
-                api_id: api_id,
-                api_key: apiCredentialsService.fetchAPIKey(api_id)
+        getAPIOptions: function(includeAPIKey) {
+        apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
+            if (includeAPIKey) {
+                console.log('includeAPIKey called');
+
+                return {
+                    api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
+                    api_id: apiId,
+                    api_key: apiCredentialsService.fetchAPIKey(apiId)
+                }
+            } else {
+                console.log('includeAPIKey NOT called');
+                return {
+                    api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
+                    api_id: apiId
+                }
             }
         },
 
@@ -289,9 +299,8 @@ define([
                 success: function (model, _response, _options) {
                     this.apiHost = model.entry.content.attributes.api_host;
                     this.apiId = model.entry.content.attributes.api_id;
-                    this.apiKey = apiCredentialsService.fetchAPIKey(this.apiId);
 
-                    if (![this.apiHost, this.apiId, this.apiKey].every(el => el)) {
+                    if (![this.apiHost, this.apiId, apiCredentialsService.fetchAPIKey(this.apiId)].every(el => el)) {
                         this.showErrorMessage('.empty-conf');
                         return false;
                     }
@@ -316,10 +325,9 @@ define([
 
         initSelectTag: function(obj, endpoint, selected_array = []) {
             var $element = obj.select2();
-
             var $request = $.ajax({
                 url: Splunk.util.make_full_url("/custom/amp4e_events_input/amp_streams_api_controller/" + endpoint),
-                data: this.getAPIOptions(),
+                data: this.getAPIOptions(true)
             });
 
             var _this = this;
