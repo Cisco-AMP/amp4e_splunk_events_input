@@ -14,9 +14,9 @@ class StoreInspector(object):
 
     def list_collections(self):
         for collection in self._service.kvstore:
-            print "  {}".format(collection.name)
+            print("  {}".format(collection.name))
 
     def list_records_within_amp_collection(self, query=None):
         if query is None:
             query = {}
-        print json.dumps(self.collection.data.query(query=json.dumps(query)), indent=1)
+        print(json.dumps(self.collection.data.query(query=json.dumps(query)), indent=1))

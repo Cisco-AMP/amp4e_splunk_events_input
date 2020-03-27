@@ -1,5 +1,5 @@
 import unittest
-from bin.amp4e_events_input.stream_dict_manager import StreamDictManager
+from amp4e_events_input_lib.stream_dict_manager import StreamDictManager
 
 
 class TestStreamDictManager(unittest.TestCase):
