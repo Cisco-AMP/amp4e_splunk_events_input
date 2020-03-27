@@ -245,19 +245,32 @@ define([
         },
 
         getAPIOptions: function(includeAPIKey) {
-        apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
-            if (includeAPIKey) {
-                console.log('includeAPIKey called');
+            apiId = this.ampInputConfiguration.entry.content.attributes.api_id;
+            apiHost = this.ampInputConfiguration.entry.content.attributes.api_host;
 
+            // migrate to new secure format for api key if an api key exists in unsecure format
+            // to blank out api key, we must set it to null
+            apiKey = this.ampInput.content.api_key;
+            if (apiKey && apiKey.length > 0 && includeAPIKey == false) {
                 return {
                     api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
+                    api_id: apiId,
+                    api_key: null
+                }
+            }
+
+            if (includeAPIKey) {
+                // for creating or updating the stream
+                return {
+                    api_host: apiHost,
                     api_id: apiId,
                     api_key: apiCredentialsService.fetchAPIKey(apiId)
                 }
             } else {
-                console.log('includeAPIKey NOT called');
+                // for creating the input
+                // new format without api key
                 return {
-                    api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
+                    api_host: apiHost,
                     api_id: apiId
                 }
             }

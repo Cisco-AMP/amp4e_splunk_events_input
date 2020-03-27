@@ -137,6 +137,19 @@ define([
                 url: '/splunkd/__raw/services/configs/conf-inputs/amp4e_events_input',
                 success: function (model, _response, _options) {
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
+
+                    // migrate to new secure format for api key if an api key exists in unsecure format
+                    apiKey = model.entry.content.attributes.api_key;
+                    apiId = model.entry.content.attributes.api_id;
+                    if (apiKey && apiKey.length > 0) {
+                        // save secured api key
+                        apiCredentialsService.saveAPIKey(apiId, apiKey);
+
+                        // remove plain text api key
+                        this.ampInputConfiguration.entry.content.attributes.api_key = null;
+                        this.ampInputConfiguration.save();
+                    }
+
                     this.setApiHost(model.entry.content.attributes.api_host);
                     this.setApiId(model.entry.content.attributes.api_id);
                     this.setApiKey(apiCredentialsService.fetchAPIKey(this.getApiId()));

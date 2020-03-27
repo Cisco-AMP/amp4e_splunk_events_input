@@ -104,7 +104,7 @@ define([
                     apiId = model.entry.content.attributes.api_id;
                     if (apiKey && apiKey.length > 0) {
                         // save and encrypt api key
-                        this.saveAPIKey(apiKey, apiId);
+                        apiCredentialsService.saveAPIKey(apiId, apiKey);
 
                         // remove plain text api key
                         this.ampInputConfiguration.entry.content.attributes.api_key = null;
