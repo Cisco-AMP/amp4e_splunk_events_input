@@ -12,7 +12,7 @@ class SplunkbaseReleaser(AbstractReleaser):
     APP_NAME = 'amp4e_events_input'
     PATH_TO_PYTHON_LIBS = '/opt/splunk/lib/python2.7/site-packages'
     PYTHON_LIBS_TO_ARCHIVE = ['splunklib', 'pika']
-    EXCLUDED_FILES = ['local.meta', '*.pyc', '*.pyo']
+    EXCLUDED_FILES = ['local.meta', 'requirements-splunk.txt', '*.pyc', '*.pyo']
 
     @property
     def _release_file_path(self):

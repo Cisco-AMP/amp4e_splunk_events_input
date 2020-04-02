@@ -6,7 +6,7 @@ from distutils.dir_util import copy_tree
 class AbstractReleaser(object):
     DIRS_TO_ARCHIVE = []
     APP_NAME = ''
-    EXCLUDED_FILES = ['local.meta', '*.pyc', '*.pyo']
+    EXCLUDED_FILES = ['local.meta', 'requirements-splunk.txt', '*.pyc', '*.pyo']
     SPLUNKBASE_README = 'README_SPLUNKBASE.md'
     LICENSE = 'LICENSE'
 

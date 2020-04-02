@@ -1,7 +1,7 @@
 splunk-sdk
-pika==0.13.1
+pika
 
 requests
 requests-mock
 six
-fabric==1.13.2
+fabric
