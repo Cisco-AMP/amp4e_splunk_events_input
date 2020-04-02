@@ -17,8 +17,9 @@ Python 2.7
 
 1. You can clone the project into any directory and then link the directory to `$SPLUNK_HOME/etc/apps/amp4e_events_input`.
 2. To install the app dependencies with pip, within the project root run
-`pip install -r requirements.txt --target=bin`.
-3. Restart Splunk
+`pip install -r bin/requirements-splunk.txt --target=bin`.
+3. Install requests_mock as it's the dependency for the tests: `pip install 'requests_mock==1.3.0'`
+4. Restart Splunk
 
 After these actions you will have the app installed and can get to coding. Please note that in order to have your
 changes reflected you'll have to restart the Splunk instance.
