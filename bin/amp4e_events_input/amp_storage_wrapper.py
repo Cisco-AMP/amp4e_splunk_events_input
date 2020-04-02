@@ -1,6 +1,6 @@
 import json
 
-from .transient_service_factory import TransientServiceFactory
+from transient_service_factory import TransientServiceFactory
 
 
 # Interacts with splunk's KV store to persist data about amp streams
