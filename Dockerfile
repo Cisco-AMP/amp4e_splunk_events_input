@@ -1,4 +1,4 @@
-FROM splunk/splunk:latest
+FROM splunk/splunk:7.0.3
 USER root
 RUN apt-get update
 RUN apt-get install -y libxml2-dev libxslt-dev libssl-dev python-cffi libffi-dev openssl netcat
