@@ -250,13 +250,15 @@ define([
 
             // migrate to new secure format for api key if an api key exists in unsecure format
             // to blank out api key, we must set it to null
-            apiKey = this.ampInput.content.api_key;
-            if (apiKey && apiKey.length > 0 && includeAPIKey == false) {
-                return {
+            if (this.ampInput) {
+              apiKey = this.ampInput.content.api_key;
+              if (apiKey.length > 0 && includeAPIKey == false) {
+                  return {
                     api_host: this.ampInputConfiguration.entry.content.attributes.api_host,
                     api_id: apiId,
                     api_key: null
-                }
+                  }
+              }
             }
 
             if (includeAPIKey) {
