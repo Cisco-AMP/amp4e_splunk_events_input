@@ -1,12 +1,8 @@
 language: python
 python:
-  - "3.7"
+  - "2.7"
 env:
-  global:
-    - DOCKER_COMPOSE_VERSION=1.24.0
-  jobs:
-    - PYTHON_COMMAND=python2
-    - PYTHON_COMMAND=python3
+  - DOCKER_COMPOSE_VERSION=1.24.0
 
 services:
   - docker
@@ -36,7 +32,7 @@ before_script:
     done;
 
 script:
-  - docker-compose exec -u splunk splunk /opt/splunk/bin/splunk cmd $PYTHON_COMMAND -m unittest discover
+  - docker-compose exec -u splunk splunk /opt/splunk/bin/splunk cmd python -m unittest discover
 
 after_script:
   - docker-compose down

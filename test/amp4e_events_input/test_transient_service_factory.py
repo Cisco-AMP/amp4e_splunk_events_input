@@ -2,7 +2,7 @@ import unittest
 
 from splunklib.client import Service
 
-from amp4e_events_input_lib.transient_service_factory import TransientServiceFactory
+from bin.amp4e_events_input.transient_service_factory import TransientServiceFactory
 from test.support.mock_definitions import MockDefinitions
 
 

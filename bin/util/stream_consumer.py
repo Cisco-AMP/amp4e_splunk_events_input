@@ -4,7 +4,7 @@ from random import randint
 
 import pika
 from pika.exceptions import AMQPChannelError, ConnectionClosed, NoFreeChannels
-from .logger import logger
+from logger import logger
 
 
 class StreamConsumer(object):
