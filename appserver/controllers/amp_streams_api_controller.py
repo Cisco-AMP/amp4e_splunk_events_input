@@ -12,35 +12,33 @@ sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "b
 
 from util.api_service import ApiService, ApiError
 from util.logger import logger
+from amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
+from amp4e_events_input.stream_dict_manager import StreamDictManager
 
-from amp4e_events_input_lib.amp_storage_wrapper import AmpStorageWrapper
-from amp4e_events_input_lib.stream_dict_manager import StreamDictManager
 
 # When the controller has any kind of runtime error - Splunk will simply ignore it, returning 404.
 # Make sure you have no runtime errors before trying to reach this controller from Splunk Web
 class AmpStreamsApiController(controllers.BaseController):
-    class ApiErrorHandler(object):
-        @classmethod
-        def jsonify_errors(cls, func):
-            @wraps(func)
-            def wrapper(inst, *args, **kwargs):
-                try:
-                    return func(inst, *args, **kwargs)
-                except ApiError as e:
-                    return inst.__json_error(e.extract_data_from_message())
-                except Exception as e:
-                    return inst.__json_error({'error': str(e), 'trace': traceback.format_exc()})
+    def jsonify_errors(func):
+        @wraps(func)
+        def wrapper(inst, *args, **kwargs):
+            try:
+                return func(inst, *args, **kwargs)
+            except ApiError as e:
+                return inst.__json_error(e.extract_data_from_message())
+            except Exception as e:
+                return inst.__json_error({'error': str(e), 'trace': traceback.format_exc()})
 
-            return wrapper
+        return wrapper
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET'])
     def event_streams_list(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         response = amp_api.index()
         return self.render_json(response['data'])
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET', 'POST'])
     def save_stream(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
@@ -63,7 +61,7 @@ class AmpStreamsApiController(controllers.BaseController):
         output.success = True
         return self.render_json(output)
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET', 'DELETE'])
     def delete_stream(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
@@ -77,7 +75,7 @@ class AmpStreamsApiController(controllers.BaseController):
         output.success = True
         return self.render_json(output)
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET', 'DELETE'])
     def delete_event_stream(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
@@ -86,14 +84,14 @@ class AmpStreamsApiController(controllers.BaseController):
         output.success = True
         return self.render_json(output)
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET'])
     def event_types_list(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])
         response = amp_api.event_types()
         return self.render_json(response['data'])
 
-    @ApiErrorHandler.jsonify_errors
+    @jsonify_errors
     @expose_page(must_login=True, methods=['GET'])
     def groups_list(self, **kwargs):
         amp_api = ApiService(kwargs['api_host'], kwargs['api_id'], kwargs['api_key'])

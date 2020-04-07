@@ -3,7 +3,7 @@ import json
 
 from splunklib.client import Service, KVStoreCollection
 
-from amp4e_events_input_lib.amp_storage_wrapper import AmpStorageWrapper
+from bin.amp4e_events_input.amp_storage_wrapper import AmpStorageWrapper
 from test.support.mock_definitions import MockDefinitions
 from test.support.config import SPLUNK_AUTH_OPTIONS
 
