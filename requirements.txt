@@ -5,4 +5,4 @@ requests
 requests_mock
 six
 fabric==1.13.2
-enum
+enum34
