@@ -1,7 +1,8 @@
 require.config({
     paths: {
         text: "../app/amp4e_events_input/js/lib/text",
-        setup_view: '../app/amp4e_events_input/js/views/SetupView'
+        setup_view: '../app/amp4e_events_input/js/views/SetupView',
+        api_credentials: "../app/amp4e_events_input/js/lib/api_credentials_service"
     }
 });
 
@@ -10,6 +11,7 @@ define([
     "jquery",
     "models/SplunkDBase",
     "setup_view",
+    "api_credentials",
     "util/splunkd_utils",
     "text!../app/amp4e_events_input/js/templates/AppSetupView.html"
 ], function(
@@ -17,6 +19,7 @@ define([
     $,
     SplunkDBaseModel,
     SetupView,
+    apiCredentialsService,
     splunkd_utils,
     Template
 ){
@@ -55,7 +58,6 @@ define([
         updateModel: function(){
             this.ampInputConfiguration.entry.content.attributes.api_host = this.getApiHost();
             this.ampInputConfiguration.entry.content.attributes.api_id = this.getApiId();
-            this.ampInputConfiguration.entry.content.attributes.api_key = this.getApiKey();
         },
 
         saveConfig: function(){
@@ -70,7 +72,8 @@ define([
                 this.showFormInProgress(true);
 
                 $.when(
-                    this.ampInputConfiguration.save()
+                    this.ampInputConfiguration.save(),
+                    apiCredentialsService.saveAPIKey(this.getApiId(), this.getApiKey())
                 )
                 // If successful, show a success message
                 .then(function(){
@@ -134,9 +137,22 @@ define([
                 url: '/splunkd/__raw/services/configs/conf-inputs/amp4e_events_input',
                 success: function (model, _response, _options) {
                     console.info("Successfully retrieved the default amp4e_events_input configuration");
+
+                    // migrate to new secure format for api key if an api key exists in unsecure format
+                    apiKey = model.entry.content.attributes.api_key;
+                    apiId = model.entry.content.attributes.api_id;
+                    if (apiKey && apiKey.length > 0) {
+                        // save secured api key
+                        apiCredentialsService.saveAPIKey(apiId, apiKey);
+
+                        // remove plain text api key
+                        this.ampInputConfiguration.entry.content.attributes.api_key = null;
+                        this.ampInputConfiguration.save();
+                    }
+
                     this.setApiHost(model.entry.content.attributes.api_host);
                     this.setApiId(model.entry.content.attributes.api_id);
-                    this.setApiKey(model.entry.content.attributes.api_key);
+                    this.setApiKey(apiCredentialsService.fetchAPIKey(this.getApiId()));
                 }.bind(this),
                 error: function () {
                     console.warn("Unsuccessfully retrieved the default amp4e_events_input configuration");
@@ -179,5 +195,6 @@ define([
             this.addValidator('.api_key', this.getApiKey.bind(this), function(value) { return !!value; },
                 "Is required");
         }
+
     });
 });
