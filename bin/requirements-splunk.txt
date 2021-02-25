@@ -1,2 +1,2 @@
-#splunk-sdk==1.6.15
-#pika==0.13.1
+splunk-sdk
+pika==0.13.1

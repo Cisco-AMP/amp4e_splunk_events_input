@@ -11,6 +11,8 @@ from urlparse import urlsplit
 import socket
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+sys.path.insert(0, make_splunkhome_path(["lib","python3","site-packages"]))
 from splunklib.client import Service
 import pika as pika
 

@@ -1,9 +1,9 @@
 FROM splunk/splunk:8.1.2-debian
 USER root
 RUN apt-get update
-RUN apt-get install -y libxml2-dev libxslt-dev libssl-dev python-cffi libffi-dev openssl netcat
-RUN apt-get install -y python-pip python-dev
-RUN apt-get install -y python-setuptools
+RUN apt-get install -y libxml2-dev libxslt-dev libssl-dev python3-cffi libffi-dev openssl netcat
+RUN apt-get install -y python3-pip python3-dev python3-requests
+RUN apt-get install -y python3-setuptools
 RUN pip install wheel
 RUN pip install setuptools
 RUN pip install fabric
