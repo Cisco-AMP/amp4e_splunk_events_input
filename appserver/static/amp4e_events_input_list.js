@@ -1,7 +1,7 @@
 
 require.config({
     paths: {
-        amp4e_events_input_list: "../app/amp4e_events_input/js/views/Amp4eEventsInputListView"
+        amp4e_events_input_list: "/static/app/amp4e_events_input/js/views/Amp4eEventsInputListView"
     }
 });
 
