@@ -1,35 +1,35 @@
 version: "3.4"
 services:
-  # splunk:
-  #   build: .
-  #   volumes:
-  #     - type: bind
-  #       source: ./
-  #       target: /opt/splunk/etc/apps/amp4e_events_input
-  #   environment:
-  #     - SPLUNK_HOME=/opt/splunk
-  #     - SPLUNK_START_ARGS=--accept-license
-  #     - SPLUNK_PASSWORD=5up3rn0va
-  #     - DEBUG=true
-  #   ports:
-  #     - "8000:8000"
-  #   working_dir: /opt/splunk/etc/apps/amp4e_events_input
-  #   entrypoint: /sbin/amp_entrypoint.sh
-  #   command: start-service
-  # Uncomment below for a clean container to use for testing
-  splunk-test:
+  splunk:
     build: .
-    image: splunk/splunk:8.1.2
-    environment:
-      - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=changeme
-      - DEBUG=true
     volumes:
       - type: bind
         source: ./
         target: /opt/splunk/etc/apps/amp4e_events_input
+    environment:
+      - SPLUNK_HOME=/opt/splunk
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=5up3rn0va
+      - DEBUG=true
     ports:
-      - "8002:8000"
+      - "8000:8000"
     working_dir: /opt/splunk/etc/apps/amp4e_events_input
     entrypoint: /sbin/amp_entrypoint.sh
     command: start-service
+  # Uncomment below for a clean container to use for testing
+  # splunk-test:
+  #   build: .
+  #   image: splunk/splunk:8.1.2
+  #   environment:
+  #     - SPLUNK_START_ARGS=--accept-license
+  #     - SPLUNK_PASSWORD=changeme
+  #     - DEBUG=true
+  #   volumes:
+  #     - type: bind
+  #       source: ./
+  #       target: /opt/splunk/etc/apps/amp4e_events_input
+  #   ports:
+  #     - "8002:8000"
+  #   working_dir: /opt/splunk/etc/apps/amp4e_events_input
+  #   entrypoint: /sbin/amp_entrypoint.sh
+  #   command: start-service
