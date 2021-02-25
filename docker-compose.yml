@@ -9,7 +9,7 @@ services:
     environment:
       - SPLUNK_HOME=/opt/splunk
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=5up3rn0va
+      - SPLUNK_PASSWORD=changeme
       - DEBUG=true
     ports:
       - "8000:8000"
