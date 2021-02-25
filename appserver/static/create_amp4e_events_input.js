@@ -1,6 +1,6 @@
 require.config({
     paths: {
-    	amp4e_events_input_create_view: '../app/amp4e_events_input/js/views/Amp4eEventsInputCreateView'
+    	amp4e_events_input_create_view: '/static/app/amp4e_events_input/js/views/Amp4eEventsInputCreateView'
     }
 });
 

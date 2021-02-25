@@ -1,14 +1,16 @@
 import time
 import traceback
 from random import randint
+import sys
+
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
 
 import pika
 from pika.exceptions import AMQPChannelError, ConnectionClosed, NoFreeChannels
 import sys
-from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-
-sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin", "util"]))
-from logger import logger
+from util.logger import logger
 
 
 class StreamConsumer(object):

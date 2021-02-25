@@ -1,6 +1,6 @@
 require.config({
     paths: {
-        custom_setup: "../app/amp4e_events_input/js/views/AppSetupView"
+        custom_setup: "/static/app/amp4e_events_input/js/views/AppSetupView"
     }
 });
 
