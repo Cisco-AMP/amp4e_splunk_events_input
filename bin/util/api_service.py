@@ -147,10 +147,10 @@ class ApiError(Exception):
                        'happened because the stream has been deleted directly through API. Please contact support.'
 
     def __init__(self, message, status):
-        super(ApiError, self).__init__(message)
         logger.error('API Error (status {}): {}'.format(status, message))
         self.status = status
         self.stream_is_not_found = False
+        self.message = message
         self.__set_message()
 
     def __str__(self):
