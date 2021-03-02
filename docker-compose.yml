@@ -12,7 +12,7 @@ services:
       - SPLUNK_PASSWORD=changeme
       - DEBUG=true
     ports:
-      - "8001:8000"
+      - "8000:8000"
     working_dir: /opt/splunk/etc/apps/amp4e_events_input
     entrypoint: /sbin/amp_entrypoint.sh
     command: start-service
