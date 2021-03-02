@@ -8,6 +8,9 @@ import sys
 
 from amp4e_events_input.stream_dict_manager import StreamDictManager
 from splunk.clilib import cli_common as cli
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin", "util"]))
 from logger import logger
 
 
