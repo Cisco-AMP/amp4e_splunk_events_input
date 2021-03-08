@@ -1,4 +1,7 @@
 import unittest
+import sys
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input"]))
 from bin.amp4e_events_input.stream_dict_manager import StreamDictManager
 
 

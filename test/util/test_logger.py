@@ -1,6 +1,5 @@
 import unittest
 import logging
-
 from bin.util.logger import Logger
 
 
