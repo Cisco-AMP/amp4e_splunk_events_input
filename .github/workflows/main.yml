@@ -35,7 +35,6 @@ jobs:
       options: --working_dir /opt/splunk/etc/apps/amp4e_events_input
     services:
       splunk:
-        id: splunk
         image: amp4e/amp4e_splunk_events_input:latest
         ports:
           - 8000:8000
