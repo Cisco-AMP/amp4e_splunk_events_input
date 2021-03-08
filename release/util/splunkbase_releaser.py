@@ -6,7 +6,7 @@ import shutil
 class SplunkbaseReleaser:
     DIRS_TO_ARCHIVE = ['appserver', 'bin', 'certs', 'default', 'metadata', 'README', 'static']
     APP_NAME = 'amp4e_events_input'
-    PATH_TO_PYTHON_LIBS = '/opt/splunk/lib/python3/site-packages'
+    PATH_TO_PYTHON_LIBS = '/opt/splunk/lib/python3.7/site-packages'
     PYTHON_LIBS_TO_ARCHIVE = ['splunklib', 'pika']
     EXCLUDED_FILES = ['local.meta', 'requirements-splunk.txt', '*.pyc', '*.pyo']
     SPLUNKBASE_README = 'README_SPLUNKBASE.md'

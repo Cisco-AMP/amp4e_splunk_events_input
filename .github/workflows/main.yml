@@ -1,0 +1,64 @@
+on: 
+  release:
+    types:
+    - published
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to Dockerhub
+      uses: docker/login-action@v1.8.0
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - uses: docker/setup-buildx-action@v1
+      if: ${{ !env.ACT }}
+    - name: build dev
+      if: ${{ !env.ACT }}
+      uses: docker/build-push-action@v2
+      with:
+        context: ./
+        file: ./Dockerfile
+        push: true
+        target: dev
+        tags: amp4e/amp4e_splunk_events_input:latest
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: amp4e/amp4e_splunk_events_input:latest
+      env:
+        # PATH: /opt/splunk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        # PYTHONPATH: /opt/splunk/lib/python3.7
+        SPLUNK_START_ARGS: --accept-license
+        SPLUNK_PASSWORD: Changeme123!
+        SPLUNK_API_HOST: splunk
+        SPLUNK_API_PORT: 8089
+        SPLUNK_API_USERNAME: admin
+      options: --working_dir /opt/splunk/etc/apps/amp4e_events_input
+    services:
+      splunk:
+        id: splunk
+        image: amp4e/amp4e_splunk_events_input:latest
+        ports:
+          - 8000:8000
+          - 8089:8089
+        env:
+          SPLUNK_START_ARGS: --accept-license
+          SPLUNK_PASSWORD: Changeme123!
+          DEBUG: true
+    steps:
+    - uses: actions/checkout@v2
+    - run: env
+    - run: touch /opt/splunk/etc/splunk-launch.conf
+    - run: nohup amp_entrypoint.sh start-service &
+    - run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
+    - run: python3 -m pip install -r requirements.txt
+    - name: wait for service
+      uses: nev7n/wait_for_response@v1
+      with:
+        url: https://splunk:8089
+        responseCode: 200
+        timeout: 60000
+        interval: 500
+    - run: /opt/splunk/bin/splunk cmd python -m unittest discover
