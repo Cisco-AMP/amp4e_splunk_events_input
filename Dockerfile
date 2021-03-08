@@ -9,4 +9,6 @@ RUN python3 -m pip uninstall enum
 ENV LD_LIBRARY_PATH=${SPLUNK_HOME}/lib:${LD_LIBRARY_PATH}
 ENV SPLUNK_DB=${SPLUNK_HOME}/var/lib/splunk
 COPY amp_entrypoint.sh /sbin
+COPY . /opt/splunk/etc/apps/amp4e_events_input
+WORKDIR  /opt/splunk/etc/apps/amp4e_events_input
 ENTRYPOINT [ "/sbin/amp_entrypoint.sh" ]

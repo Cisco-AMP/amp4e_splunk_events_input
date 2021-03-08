@@ -5,5 +5,5 @@ SPLUNK_AUTH_OPTIONS = {
     'host': os.getenv('SPLUNK_API_HOST', 'localhost'),
     'port': os.getenv('SPLUNK_API_PORT', 8089),
     'username': os.getenv('SPLUNK_API_USERNAME', 'admin'),
-    'password': os.getenv('SPLUNK_PASSWORD', 'Change123!')
+    'password': os.getenv('SPLUNK_PASSWORD', 'Changeme123!'),
 }

@@ -4,9 +4,7 @@ services:
     image: amp4e/amp4e_splunk_events_input:latest
     build: .
     volumes:
-      - type: bind
-        source: ./
-        target: /opt/splunk/etc/apps/amp4e_events_input
+      - .:/opt/splunk/etc/apps/amp4e_events_input
     environment:
       - SPLUNK_HOME=/opt/splunk
       - SPLUNK_START_ARGS=--accept-license
@@ -15,5 +13,4 @@ services:
     ports:
       - "8000:8000"
       - "8089:8089"
-    working_dir: /opt/splunk/etc/apps/amp4e_events_input
     command: start-service

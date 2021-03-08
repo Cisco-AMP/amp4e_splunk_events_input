@@ -1,4 +1,4 @@
-import os, stat
+import os
 from distutils.dir_util import copy_tree
 from invoke import task, run
 import shutil
@@ -67,9 +67,9 @@ class SplunkbaseReleaser:
     def make_bin_dir_executable(self):
         for root, dirs, files in os.walk(os.path.join(self._tmp_app_dir, 'bin')):
             for f in files:
-                os.chmod(os.path.join(root, f), stat.S_IRWXO)
+                os.chmod(os.path.join(root, f), 0o755)
             for d in dirs:
-                os.chmod(os.path.join(root, d), stat.S_IRWXO)
+                os.chmod(os.path.join(root, d), 0o755)
 
     def create_archive(self):
         print("CREATING FILE")
