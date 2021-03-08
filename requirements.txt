@@ -4,5 +4,5 @@ pika==0.13.1
 requests
 requests_mock
 six
-fabric==1.13.2
+fabric
 enum34
