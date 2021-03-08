@@ -1,5 +1,8 @@
 import unittest
-
+import sys
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+sys.path.insert(0, make_splunkhome_path(["lib","python3","site-packages"]))
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input"]))
 from splunklib.client import Service
 
 from bin.amp4e_events_input.transient_service_factory import TransientServiceFactory

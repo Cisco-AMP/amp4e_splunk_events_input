@@ -8,6 +8,9 @@ import sys
 
 from amp4e_events_input.stream_dict_manager import StreamDictManager
 from splunk.clilib import cli_common as cli
+from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
+
+sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin", "util"]))
 from logger import logger
 
 
@@ -144,10 +147,10 @@ class ApiError(Exception):
                        'happened because the stream has been deleted directly through API. Please contact support.'
 
     def __init__(self, message, status):
-        super(ApiError, self).__init__(message)
         logger.error('API Error (status {}): {}'.format(status, message))
         self.status = status
         self.stream_is_not_found = False
+        self.message = message
         self.__set_message()
 
     def __str__(self):
