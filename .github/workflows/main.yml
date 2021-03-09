@@ -33,7 +33,7 @@ jobs:
         SPLUNK_API_USERNAME: admin
     services:
       splunk:
-        image: splunk/splunk:8.1.2-debian
+        image: amp4e/amp4e_splunk_events_input:latest
         ports:
           - 8000:8000
           - 8089:8089
@@ -48,9 +48,4 @@ jobs:
       if: ${{ env.ACT }}
     - run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
     - run: python3 -m pip install -r requirements.txt
-    - uses: jakejarvis/wait-action@master
-      with:
-        time: '10s' # Unfortunately, Splunk's api endpoint are not ready yet even though docker reports healthy
     - run: /opt/splunk/bin/splunk cmd python -m unittest discover
-    - run: docker logs "${{ job.services.splunk.id }}"
-      if: always()

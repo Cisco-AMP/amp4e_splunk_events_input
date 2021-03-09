@@ -1,37 +1,11 @@
-on: release
+on: push
 jobs:
   test:
     runs-on: ubuntu-latest
     container:
       image: amp4e/amp4e_splunk_events_input:latest
-      env:
-        # PATH: /opt/splunk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-        # PYTHONPATH: /opt/splunk/lib/python3.7
-        SPLUNK_START_ARGS: --accept-license
-        SPLUNK_PASSWORD: Changeme123!
-        SPLUNK_API_HOST: splunk
-        SPLUNK_API_PORT: 8089
-        SPLUNK_API_USERNAME: admin
-    services:
-      splunk:
-        image: splunk/splunk:8.1.2-debian
-        ports:
-          - 8000:8000
-          - 8089:8089
-        env:
-          SPLUNK_START_ARGS: --accept-license
-          SPLUNK_PASSWORD: Changeme123!
-          DEBUG: true
     steps:
     - uses: actions/checkout@v2
-    - run: env
-    - run: touch /opt/splunk/etc/splunk-launch.conf
-    - run: nohup amp_entrypoint.sh start-service &
-      if: ${{ env.ACT }}
     - run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
     - run: python3 -m pip install -r requirements.txt
-    - uses: jakejarvis/wait-action@master
-      with:
-        time: '10s' # Unfortunately, Splunk's api endpoint are not ready yet even though docker reports healthy
-    - run: /opt/splunk/bin/splunk cmd python -m unittest discover
-    - run: docker logs "${{ job.services.splunk.id }}"
+    - run: python3 /usr/local/bin/fab splunkbase-release      
