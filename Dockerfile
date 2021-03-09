@@ -12,3 +12,4 @@ COPY amp_entrypoint.sh /sbin
 COPY . /opt/splunk/etc/apps/amp4e_events_input
 WORKDIR  /opt/splunk/etc/apps/amp4e_events_input
 ENTRYPOINT [ "/sbin/amp_entrypoint.sh" ]
+CMD [ "start-service" ]
