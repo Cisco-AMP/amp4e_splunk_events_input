@@ -36,7 +36,6 @@ jobs:
       splunk:
         image: amp4e/amp4e_splunk_events_input:latest
         ports:
-          - 8000:8000
           - 8089:8089
         env:
           SPLUNK_START_ARGS: --accept-license

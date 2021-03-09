@@ -33,6 +33,7 @@ class TestWrapperWithConnection(unittest.TestCase):
         self.service = Service(owner='nobody', app='amp4e_events_input', scheme=SPLUNK_AUTH_OPTIONS['scheme'],
                                host=SPLUNK_AUTH_OPTIONS['host'], port=SPLUNK_AUTH_OPTIONS['port'],
                                username=SPLUNK_AUTH_OPTIONS['username'], password=SPLUNK_AUTH_OPTIONS['password'])
+        print(SPLUNK_AUTH_OPTIONS)
         self.service.login()
         self.service.kvstore.create(self.COLLECTION_NAME)
         self.metadata = MockDefinitions(self.service.token).metadata
