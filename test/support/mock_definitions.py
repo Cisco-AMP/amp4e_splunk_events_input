@@ -5,5 +5,7 @@ class MockDefinitions(object):
 
     @property
     def metadata(self):
-        return {'server_uri': 'https://127.0.0.1:8089/', 'session_key': self.session_key,
+        host = os.getenv('SPLUNK_API_HOST', 'localhost')
+        port = os.getenv('SPLUNK_API_PORT', 8089),
+        return {'server_uri': 'https://{host}:{port}/', 'session_key': self.session_key,
                 'name': 'amp4e_events_test_input'}
