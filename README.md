@@ -1,6 +1,7 @@
 # Cisco AMP for Endpoints Events Input
 
 [![Build Status](https://travis-ci.org/Cisco-AMP/amp4e_splunk_events_input.svg?branch=master)](https://travis-ci.org/Cisco-AMP/amp4e_splunk_events_input)
+[![.github/workflows/main.yml](https://github.com/Cisco-AMP/amp4e_splunk_events_input/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/Cisco-AMP/amp4e_splunk_events_input/actions/workflows/main.yml)
 
 ## Prerequisites
 
