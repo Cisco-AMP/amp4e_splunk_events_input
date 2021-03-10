@@ -20,6 +20,7 @@ jobs:
         push: true
         tags: amp4e/amp4e_splunk_events_input:latest
   test:
+    needs: build
     runs-on: ubuntu-latest
     container:
       image: amp4e/amp4e_splunk_events_input:latest

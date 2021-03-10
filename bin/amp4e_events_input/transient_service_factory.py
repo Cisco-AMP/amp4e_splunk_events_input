@@ -22,7 +22,7 @@ class TransientServiceFactory(object):
         session_key = self.metadata['session_key']
 
         splunkd = urlsplit(splunkd_uri, allow_fragments=False)
-
+        print(splunkd.hostname)
         self._service = Service(
             owner=self.owner,
             app=self.app,
