@@ -2,11 +2,10 @@ import json
 
 
 from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-sys.path.insert(0, make_splunkhome_path(["lib","python3","site-packages"]))
 from splunklib.client import Service
 
 class StoreInspector(object):
-    def __init__(self, host='localhost', port='8089', scheme='https', username='admin', password='changeme'):
+    def __init__(self, host='localhost', port='8089', scheme='https', username='admin', password='Changeme123!'):
         self._service = Service(owner='nobody', app='amp4e_events_input', scheme=scheme, host=host, port=port,
                                 username=username, password=password)
         # self._service = Service(owner='nobody', app='amp4e_events_input', scheme='https', host='localhost', port='8089',

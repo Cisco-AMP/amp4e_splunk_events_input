@@ -2,7 +2,6 @@ import unittest
 import json
 import sys
 from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-sys.path.insert(0,"/opt/splunk/lib/python3/site-packages/requests_mock")
 sys.path.insert(1, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
 import requests_mock
 from util.api_service import ApiService, ApiError

@@ -3,7 +3,6 @@ try:
 except ImportError:
      from urlparse import urlsplit
 from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
-sys.path.insert(0, make_splunkhome_path(["lib","python3","site-packages"]))
 from splunklib.client import Service
 
 
