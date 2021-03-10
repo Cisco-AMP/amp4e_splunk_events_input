@@ -7,3 +7,4 @@ metadata/local.meta
 !/tmp/.keep
 /release/*.spl
 .DS_Store
+.secrets
