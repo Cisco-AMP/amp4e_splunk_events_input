@@ -6,7 +6,6 @@ import sys
 from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
 
 sys.path.insert(0, make_splunkhome_path(["etc", "apps", "amp4e_events_input", "bin"]))
-sys.path.insert(0, make_splunkhome_path(["lib","python3","site-packages"]))
 
 import pika
 from pika.exceptions import AMQPChannelError, ConnectionClosed, NoFreeChannels

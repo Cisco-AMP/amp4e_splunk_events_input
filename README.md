@@ -70,9 +70,9 @@ docker-compose up
 ## Testing
 
 * Enter your admin credentials in test/support/config.py
-* To execute all tests, `docker-compose exec -u  splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest discover'`.
+* To execute all tests, `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest discover'`.
 * If you'd like to run a single test, refer to it as to a module:
-    `docker-compose exec -u splunk splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager'`
+    `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager'`
 * When testing upgrading the app, you can uncomment the `splunk-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
 
 ## Diag
@@ -104,7 +104,7 @@ If a **new folder is added at the top level of the app**, it's name must be adde
 Creates a package for release on Splunkbase.
 
 ```bash
-docker-compose exec splunk sh -c "cd release;sudo fab splunkbase_release"
+docker-compose exec splunk python3 /usr/local/bin/fab splunkbase-release
 ```
 
 ## Known Issues
