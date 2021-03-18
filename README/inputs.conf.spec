@@ -24,3 +24,5 @@ event_types_names = <value>
 
 groups_names = <value>
 * Groups names
+
+python.version = python3
