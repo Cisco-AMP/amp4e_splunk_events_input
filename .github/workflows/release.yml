@@ -16,6 +16,7 @@ jobs:
     - run: ls -al /usr/lib/python3.7/site-packages
     - run: python3 /usr/local/bin/fab splunkbase-release
     - name: Create Release
+      continue-on-error: true
       if: ${{ !env.ACT }}
       id: create_release
       uses: actions/create-release@v1
