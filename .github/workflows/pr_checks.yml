@@ -6,7 +6,7 @@ jobs:
       SPLUNK_START_ARGS: --accept-license
       SPLUNK_PASSWORD: password
       SPLUNK_API_HOST: splunk
-      SPLUNK_API_PORT: ${{ job.services.splunk.ports[8089] }}
+      SPLUNK_API_PORT: 8089
       SPLUNK_API_USERNAME: admin
     steps:
     - name: Check out code
