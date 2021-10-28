@@ -13,10 +13,6 @@ jobs:
       uses: actions/checkout@v2
     - name: Build docker image
       run: docker build -t local .
-    - name: Setup
-      run: |
-        touch /opt/splunk/etc/splunk-launch.conf
-        python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
-        python3 -m pip install -r requirements.txt
     - name: Run tests
-      run: /opt/splunk/bin/splunk cmd python -m unittest discover
+      run: |
+        docker run local touch /opt/splunk/etc/splunk-launch.conf && /opt/splunk/bin/splunk cmd python -m unittest discover
