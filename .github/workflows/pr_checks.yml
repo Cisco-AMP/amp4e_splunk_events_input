@@ -2,14 +2,12 @@ on: pull_request
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: Dockerfile
-      env:
-        SPLUNK_START_ARGS: --accept-license
-        SPLUNK_PASSWORD: password
-        SPLUNK_API_HOST: splunk
-        SPLUNK_API_PORT: ${{ job.services.splunk.ports[8089] }}
-        SPLUNK_API_USERNAME: admin
+    env:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+      SPLUNK_API_HOST: splunk
+      SPLUNK_API_PORT: ${{ job.services.splunk.ports[8089] }}
+      SPLUNK_API_USERNAME: admin
     steps:
     - name: Check out code
       uses: actions/checkout@v2
