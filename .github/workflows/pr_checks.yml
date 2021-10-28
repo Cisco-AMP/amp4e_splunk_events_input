@@ -12,12 +12,12 @@ jobs:
         SPLUNK_API_USERNAME: admin
     steps:
     - name: Check out code
-    uses: actions/checkout@v2
+      uses: actions/checkout@v2
     - name: Build docker image
-    run: docker build -t local < ./Dockerfile
+      run: docker build -t local < ./Dockerfile
     - name: Setup
-    run: touch /opt/splunk/etc/splunk-launch.conf
-    run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
-    run: python3 -m pip install -r requirements.txt
+      run: touch /opt/splunk/etc/splunk-launch.conf
+      run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
+      run: python3 -m pip install -r requirements.txt
     - name: Run tests
-    run: /opt/splunk/bin/splunk cmd python -m unittest discover
+      run: /opt/splunk/bin/splunk cmd python -m unittest discover
