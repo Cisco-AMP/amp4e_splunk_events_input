@@ -16,8 +16,9 @@ jobs:
     - name: Build docker image
       run: docker build -t local < ./Dockerfile
     - name: Setup
-      run: touch /opt/splunk/etc/splunk-launch.conf
-      run: python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
-      run: python3 -m pip install -r requirements.txt
+      run: |
+        touch /opt/splunk/etc/splunk-launch.conf
+        python3 -m pip install -r bin/requirements-splunk.txt --target=/opt/splunk/lib/python3.7/site-packages
+        python3 -m pip install -r requirements.txt
     - name: Run tests
       run: /opt/splunk/bin/splunk cmd python -m unittest discover
