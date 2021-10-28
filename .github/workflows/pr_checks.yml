@@ -1,7 +1,6 @@
 on: pull_request
 jobs:
   test:
-    needs: build
     runs-on: ubuntu-latest
     container:
       image: Dockerfile
