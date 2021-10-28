@@ -10,14 +10,6 @@ jobs:
         SPLUNK_API_HOST: splunk
         SPLUNK_API_PORT: ${{ job.services.splunk.ports[8089] }}
         SPLUNK_API_USERNAME: admin
-    services:
-      splunk:
-        image: amp4e/amp4e_splunk_events_input:latest
-        ports:
-          - 8089:8089
-        env:
-          SPLUNK_START_ARGS: --accept-license
-          SPLUNK_PASSWORD: password
     steps:
     - uses: actions/checkout@v2
     - run: touch /opt/splunk/etc/splunk-launch.conf
