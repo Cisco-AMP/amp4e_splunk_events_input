@@ -7,10 +7,6 @@ jobs:
     - name: build dev
       uses: docker/setup-buildx-action@v1
       if: ${{ !env.ACT }}
-      with:
-        context: ./
-        file: ./Dockerfile
-        push: false
   test:
     needs: build
     runs-on: ubuntu-latest
