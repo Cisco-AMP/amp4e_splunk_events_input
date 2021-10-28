@@ -5,7 +5,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: build dev
-    - uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v1
       if: ${{ !env.ACT }}
       with:
         context: ./
