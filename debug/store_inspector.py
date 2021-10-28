@@ -5,7 +5,7 @@ from splunk.appserver.mrsparkle.lib.util import make_splunkhome_path
 from splunklib.client import Service
 
 class StoreInspector(object):
-    def __init__(self, host='localhost', port='8089', scheme='https', username='admin', password='Changeme123!'):
+    def __init__(self, host='localhost', port='8089', scheme='https', username='admin', password='password'):
         self._service = Service(owner='nobody', app='amp4e_events_input', scheme=scheme, host=host, port=port,
                                 username=username, password=password)
         # self._service = Service(owner='nobody', app='amp4e_events_input', scheme='https', host='localhost', port='8089',

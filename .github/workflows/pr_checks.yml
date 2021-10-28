@@ -1,22 +1,13 @@
 on: pull_request
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: build dev
-      uses: docker/setup-buildx-action@v1
-      if: ${{ !env.ACT }}
   test:
     needs: build
     runs-on: ubuntu-latest
     container:
-      image: amp4e/amp4e_splunk_events_input:latest
+      image: Dockerfile
       env:
-        # PATH: /opt/splunk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-        # PYTHONPATH: /opt/splunk/lib/python3.7
         SPLUNK_START_ARGS: --accept-license
-        SPLUNK_PASSWORD: Changeme123!
+        SPLUNK_PASSWORD: password
         SPLUNK_API_HOST: splunk
         SPLUNK_API_PORT: ${{ job.services.splunk.ports[8089] }}
         SPLUNK_API_USERNAME: admin
@@ -27,7 +18,7 @@ jobs:
           - 8089:8089
         env:
           SPLUNK_START_ARGS: --accept-license
-          SPLUNK_PASSWORD: Changeme123!
+          SPLUNK_PASSWORD: password
     steps:
     - uses: actions/checkout@v2
     - run: touch /opt/splunk/etc/splunk-launch.conf
