@@ -105,7 +105,7 @@ If a **new folder is added at the top level of the app**, it's name must be adde
 Creates a package for release on Splunkbase.
 
 ```bash
-docker-compose exec splunk python3 /usr/local/bin/fab splunkbase-release
+docker-compose exec splunk python3 /usr/bin/fab splunkbase-release
 ```
 
 ## Known Issues

@@ -144,7 +144,7 @@ define([
 
         setInputAndProceed: function(){
             $.ajax({
-                url: splunkd_utils.fullpath('/servicesNS/admin/amp4e_events_input/data/inputs/amp4e_events_input'),
+                url: splunkd_utils.fullpath('/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input'),
                 data: { output_mode: 'json' },
                 type: 'GET',
                 success: function(resp) {
@@ -195,7 +195,7 @@ define([
         // this will only get called if saveWithAPI succeeds
         saveInput: function() {
             $.ajax({
-                url: splunkd_utils.fullpath(['/servicesNS/admin/amp4e_events_input/data/inputs/amp4e_events_input', encodeURIComponent(this.getInputName())].join('/')),
+                url: splunkd_utils.fullpath(['/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input', encodeURIComponent(this.getInputName())].join('/')),
                 data: this.isUpdatePage ? this.getStreamUpdateOptions(false) : this.getStreamOptions(false),
                 type: 'POST',
                 success: function(resp) {
@@ -250,7 +250,7 @@ define([
 
             // migrate to new secure format for api key if an api key exists in unsecure format
             // to blank out api key, we must set it to null
-            if (this.ampInput) {
+            if (this?.ampInput?.content?.api_key) {
               apiKey = this.ampInput.content.api_key;
               if (apiKey.length > 0 && includeAPIKey == false) {
                   return {
