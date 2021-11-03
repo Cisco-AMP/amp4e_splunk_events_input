@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.0.2
+- Fixed an issue where creating or editing an input would fail in some cases
+
+### 2.0.1
+- Adds Splunk 8 and Python 3 support
+
 ### 1.1.8
 - Converts api key from unsecured to secured using Splunk's storage passwords API
 - Creating a new input configuration and stream will not save the api key in your input.conf file
