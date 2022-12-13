@@ -1,112 +1,85 @@
+[comment]: <> (Readme for splunkbase)
+
 # Cisco AMP for Endpoints Events Input
 
-[![Build Status](https://travis-ci.org/Cisco-AMP/amp4e_splunk_events_input.svg?branch=master)](https://travis-ci.org/Cisco-AMP/amp4e_splunk_events_input)
-[![.github/workflows/main.yml](https://github.com/Cisco-AMP/amp4e_splunk_events_input/actions/workflows/main.yml/badge.svg)](https://github.com/Cisco-AMP/amp4e_splunk_events_input/actions/workflows/main.yml)
+## Introduction
+
+This input provides a mechanism to create, update, and delete event streams in Cisco Advanced Malware Protection (AMP) for Endpoints via the API and index them in your Splunk® instance to make them searchable. All you need to do is provide your API host and credentials from your AMP for Endpoints account and specify the stream parameters (like events or which event types and groups should be directed to this stream).
+This app was tested on Splunk v7.0
 
 ## Prerequisites
 
-* docker
-* docker-compose
+It is expected that a user of this app:
 
-## Usage
+* is familiar with Cisco AMP for Endpoints and understands the concepts of AMP business, events, event types, and groups.
+* has an account within a working instance of the cloud hosted version of AMP for Endpoints Console. At this point, there is no support for private cloud AMP for endpoint appliances
+* has a set of Read/Write AMP API credentials.
+* knows how to access the event types and groups API endpoints in order to retrieve the codes of event types and guids of groups.
 
-```bash
-docker-compose up --build
-```
+### Connections
 
-access Splunk at [http://localhost:8000](http://localhost:8000)
+Please ensure that the following url endpoints are open
 
-## Configure splunkd to use your HTTP Proxy Server
+| Public Cloud Regions AMP for Endpoints | URL endpoint | port | protocol |
+| --- | --- | --- | --- |
+| North America | api.amp.cisco.com, export-streaming.amp.cisco.com | 443 | TCP |
+| Europe | api.eu.amp.cisco.com, export-streaming.eu.amp.cisco.com | 443 | TCP |
+| Asia Pacific | api.apjc.amp.cisco.com, export-streaming.apjc.amp.cisco.com | 443 | TCP |
 
-In `$SPLUNK_HOME/etc/system/local/server.conf` (or any other applicable location, if you are using a deployment server),
-make the following changes to the `[proxyConfig]` stanza:
+## Architecture
 
-```conf
-[proxyConfig]
-http_proxy = <string that identifies the server proxy. When set, splunkd sends all HTTP requests through
-this proxy server. The default value is unset.>
-https_proxy = <string that identifies the server proxy. When set, splunkd sends all HTTPS requests
-through the proxy server defined here. If not set, splunkd uses the proxy defined in http_proxy. The
-default value is unset.>
-no_proxy = <string that identifies the no proxy rules. When set, splunkd uses the [no_proxy] rules to
-decide whether the proxy server needs to be bypassed for matching hosts and IP Addresses. Requests going
-to localhost/loopback address are not proxied. Default is "localhost, 127.0.0.1, ::1">
-```
+This app comes with a custom interface to ensure that every meaningful action (like creating, editing, or deleting an input)
+yields expected results.
+Please note: This app interacts with a third-party service, namely, Cisco Advanced Malware Protection (AMP) for Endpoints.
+This app also uses Splunk’s built-in key-value store for persisting crucial information about event streams.
 
-You can also configure proxies by setting the environment variables `HTTP_PROXY` and `HTTPS_PROXY`.
+## Installation
 
-## Configure Splunk Web to use the key and certificate files
+This app can be installed directly from Splunkbase. The app will appear in your Splunk Apps navigation bar after it is
+successfully installed. When you visit one of the app pages, it will ask you to provide settings on the configuration page.
+The configuration contains options related to authenticating to the AMP server by API calls, specifically:
 
-In `$SPLUNK_HOME/etc/system/local/web.conf` (or any other applicable location, if you are using a deployment server),
-make the following changes to the `[settings]` stanza:
+* API host (Web address of the Cisco AMP for Endpoints API found in the AMP for Endpoints API documentation)
+* API id (3rd Party API Client ID provided by AMP for Endpoints. The credentials must allow read and write access.)
+* API key (API secret key that corresponds to the API id above.)
 
-```conf
-[settings]
-enableSplunkWebSSL = true
-privKeyPath = </home/etc/auth/mycerts/mySplunkWebPrivateKey.key >
-Absolute paths may be used. non-absolute paths are relative to $SPLUNK_HOME
+Once these have been configured you are ready to create and use the inputs.
 
-serverCert = </home/etc/auth/mycerts/mySplunkWebCertificate.pem >
-Absolute paths may be used. non-absolute paths are relative to $SPLUNK_HOME
-```
+## Use cases
 
-You can also configure certificate by setting the environment variable `SSL_CERT_FILE`.
+### Creating an input
 
-## Nuances
+You need to create the input to have the events flow into your index. To do this, go to the app interface and navigate to
+‘New Input’. If your app is properly configured, you can populate the fields:
 
-Docker complains of an upgrade during startup. This is because the initial Splunk setup initializes some databases.
-Remove the container and start again.
+* ‘Name’ should contain the Input name. The Name must be unique and cannot be changed later. If you attempt to create an input with the Name of an input that already exists, the validation will fail.
+* 'Index' contains the Splunk index the events will be directed to. It defaults to 'main', however you can specify any index within your instance. The index cannot be changed after the input is saved.
+* ‘Stream name’ should contain the unique name of an event stream. Since event streams can be created not only from Splunk app, but also via the API interface, this name serves a purpose of distinguishing the streams.
+* ‘Event Types’ allows you to select one or more event types to direct to the stream. You can only select event types that are accessible by your business. Leave this field blank to return all event types.
+* ‘Groups’ allows you to select one or more connector groups to direct to the stream. Leave this field blank to return all groups in the business.
 
-```bash
-docker-compose down
-docker-compose up
-```
+When you click ‘Save’, the stream with the parameters you provided will be created within AMP for Endpoints.
+If there is a validation failure, the appropriate message will be displayed.
+Leave either the Event Type or Groups field blank to direct all respective event types or groups to the created stream and the Splunk index.
+Please note: the number of event streams per business is limited to 5.
 
-* The changes in input app require the Splunk to be restarted. When you have made some changes, restart Splunk: `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk restart'`
-* Do not push your *local* folder to git repository, as it stores values that belong to your unique Splunk instance.
-* If you need to add a python library dependency - enter its name within the *bin/requirements-splunk.txt* and run `pip install -r bin/requirements-splunk.txt --target=$SPLUNK_HOME/lib/python2.7/site-packages`.
-* By default, Splunk will display 2 info messages about version updates when you reach its dashboard for the first time. If you see other messages (warnings or errors) - you most certainly need to fix your input app to make them disappear.
-* To perform a command within splunk python interpreter, run it with splunk cmd python, e.g.: `splunk cmd python amp4e_events_input.py --scheme`
+### Updating an input
 
-## Testing
+To update an input, click on its name at the inputs list view. Follow the procedures described previously to change the
+stream parameters. Please note: you will not be able to edit the input name or index.
 
-* Enter your admin credentials in test/support/config.py
-* To execute all tests, `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest discover'`.
-* If you'd like to run a single test, refer to it as to a module:
-    `docker-compose exec splunk sh -c '$SPLUNK_HOME/bin/splunk cmd python -m unittest test.amp4e_events_input.test_stream_dict_manager'`
-* When testing upgrading the app, you can uncomment the `splunk-test` container in docker-compose.yml. This will provide you with a fresh Splunk install to test installation/upgrading on.
+### Deleting an input
 
-## Diag
+To delete an input, click the ‘Delete’ link in its row at the inputs list view. Confirm your choice to finish the procedure.
+The event stream will be deleted from AMP for Endpoints along with the input.
 
-If a customer is having issues with the app, you should consider providing an output of diag script to authorized Cisco
-representative:
+### Searching for events
 
-```bash
-splunk login
-splunk diag --collect app:amp4e_events_input
-```
+By default, the events from the stream will be directed to the ‘main’ index. They will be populated with the sourcetype of cisco:amp:event
 
-The script will result in a *.tar.gz file, which will contain data that will greatly help us figure out your issue. These data will include sensitive information about your Splunk instance, so please **make sure you provide it ONLY to authorized Cisco representative**
+## Support
 
-## Release
-
-### General instructions
-
-Whenever a new release is made, please keep in mind that default/app.conf should be updated accordingly - *build* attribute of the `[install]` stanza and *version* attribute of the `[launcher]` stanza must be changed if needed. The *build* specifies the assets version in order to know when to expire the browser cache. It should be an integer, which you increment after you change something in app/static before release, as per Splunk's recommendations. The *version* is a version string, constructed according to [semver recommendations](https://semver.org/).
-
-### Gotchas
-
-When installing or upgrading the app, Splunk simply copies all the files from the package provided into `$SPLUNK_HOME/etc/apps/<your_package_name>`. This means that if a file or folder is deleted in a newer version of the app, when a user upgrades their app, that file will remain. It needs to be called out specifically in the upgrade process documentation that the user will need to delete it from their Splunk server.
-
-If a **new folder is added at the top level of the app**, it's name must be added to `DIRS_TO_ARCHIVE` in `release/util/splunkbase_releaser.py` to be included in the release package.
-
-### Splunkbase release
-
-Creates a package for release on Splunkbase.
-
-```bash
-docker-compose exec splunk python3 /usr/bin/fab splunkbase-release
-```
+This project is open-source, please seek guidance at project's [github page](https://github.com/Cisco-AMP/amp4e_splunk_events_input).
 
 ## Known Issues
 
@@ -118,6 +91,6 @@ ValueError: Expected instance of Parameters, not <URLParameters host=export-stre
 
 * This error occurs when two instances of the Pika library are included in your installation. If you encounter this error, check to see if the folder `$SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika` exists on your Splunk server. If it does, remove it with:
 
-    ```bash
-    $ rm -rf $SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika
-    ```
+```bash
+$ rm -rf $SPLUNK_HOME/etc/apps/amp4e_events_input/bin/pika/pika
+```

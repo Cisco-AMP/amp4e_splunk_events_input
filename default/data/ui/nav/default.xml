@@ -1,5 +1,8 @@
 <nav color="#225666">
   <view name="amp4e_events_input_list" />
+  <view name="amp4e_events_input_list_new" />
   <view name="create_amp4e_events_input" />
+  <view name="create_amp4e_events_input_new" />
   <view name="setup_amp4e_events_input" />
+  <view name="setup_amp4e_events_input_new" />
 </nav>

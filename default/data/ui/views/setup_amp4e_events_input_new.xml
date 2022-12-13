@@ -1,10 +1,10 @@
-<form hideEdit="true" script="setup.js">
+<form hideEdit="true" script="client/build/static/js/main.min.js">
   <label>Configuration</label>
   <description>Global configuration for Cisco AMP for Endpoints events input</description>
 	<row>
 	   <panel>
 	      <html>
-	         <div id="setupView">Please wait...</div>
+	         <div id="root">Please wait...</div>
 	      </html>
 	   </panel>
 	</row>
