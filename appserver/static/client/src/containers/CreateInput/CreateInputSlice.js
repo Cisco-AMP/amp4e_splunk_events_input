@@ -94,7 +94,8 @@ const initialState = {
   groups: {
     data: [],
     pending: false
-  }
+  },
+  pending: false
 }
 
 export const createInputSlice = createSlice({
@@ -136,6 +137,12 @@ export const createInputSlice = createSlice({
         data: action.payload,
         pending: false
       }
+    })
+    builder.addCase(saveWithAPI.pending, (state) => {
+      state.pending = true
+    })
+    builder.addCase(saveWithAPI.fulfilled, (state) => {
+      state.pending = false
     })
   }
 })

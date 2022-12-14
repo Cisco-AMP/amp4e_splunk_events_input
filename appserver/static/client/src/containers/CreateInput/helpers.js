@@ -1,7 +1,7 @@
-export const createSelectOptions = (options) =>
+export const createSelectOptions = (options, isIndex) =>
   options.map(({ id, guid, name }) => ({
-    value: id || guid,
-    label: `${name} (${id || guid})`
+    value: isIndex ? name : id || guid,
+    label: isIndex ? name : `${name} (${id || guid})`
   }))
 
 export const getIds = (selected) => selected.map(({ value }) => value).join(",")

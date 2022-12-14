@@ -6,7 +6,7 @@ import {
   fetchIndexes,
   saveWithAPI
 } from "./CreateInputSlice"
-import { StyledSelect } from "./StyledCreateInput"
+import { StyledContainer, StyledInput, StyledSelect } from "./StyledCreateInput"
 import { createSelectOptions, getIds, getNames } from "./helpers"
 
 const CreateInput = () => {
@@ -21,11 +21,12 @@ const CreateInput = () => {
   const { data: groups, pending: groupsPending } = useSelector(
     (state) => state.createInput.groups
   )
+  const inputIsSaving = useSelector((state) => state.createInput.pending)
 
   const formIsPending = groupsPending || eventTypesPending || indexesPending
 
   const [inputName, setInputName] = useState("")
-  const [selectedIndex, setSelectedIndex] = useState("main")
+  const [selectedIndex, setSelectedIndex] = useState({ value: "main" })
   const [streamName, setStreamName] = useState("")
   const [selectedEventTypes, setSelectedEventTypes] = useState([])
   const [selectedGroups, setSelectedGroups] = useState([])
@@ -42,7 +43,7 @@ const CreateInput = () => {
     dispatch(
       saveWithAPI({
         name: inputName,
-        index: selectedIndex,
+        index: selectedIndex.value,
         stream_name: streamName,
         event_types: getIds(selectedEventTypes),
         groups: getIds(selectedGroups),
@@ -53,14 +54,14 @@ const CreateInput = () => {
   }
 
   return (
-    <>
+    <StyledContainer>
       <div className="control-group input_name">
         <label className="control-label">
           Name
           <span className="required">*</span>
         </label>
         <div className="controls">
-          <input
+          <StyledInput
             type="text"
             name="name"
             onChange={(e) => setInputName(e.target.value)}
@@ -73,19 +74,14 @@ const CreateInput = () => {
       <div className="control-group input_index">
         <label className="control-label">Index</label>
         <div className="controls">
-          <select
+          <StyledSelect
             id="splunkIndexes"
             name="index"
-            disabled={formIsPending}
-            onChange={(event) => setSelectedIndex(event.target.value)}
-          >
-            {indexes.map(({ name }) => (
-              <option value={name} selected={name === "main"}>
-                {name}
-              </option>
-            ))}
-          </select>
-          <span className="help-inline"></span>
+            isDisabled={formIsPending}
+            onChange={(value) => setSelectedIndex(value)}
+            options={createSelectOptions(indexes, true)}
+            defaultValue={{ option: "main", label: "main" }}
+          />
           <span className="help-block">
             In which index would you like the events to appear?
           </span>
@@ -101,7 +97,7 @@ const CreateInput = () => {
             <span className="required">*</span>
           </label>
           <div className="controls">
-            <input
+            <StyledInput
               type="text"
               name="stream_name"
               disabled={formIsPending}
@@ -121,7 +117,7 @@ const CreateInput = () => {
               DropdownIndicator: () => null,
               IndicatorsContainer: () => null
             }}
-            disabled={formIsPending}
+            isDisabled={formIsPending}
             onChange={(value) => setSelectedEventTypes(value)}
             placeholder="Leave this field blank to return all Event types"
             options={createSelectOptions(eventTypes)}
@@ -140,7 +136,7 @@ const CreateInput = () => {
                 DropdownIndicator: () => null,
                 IndicatorsContainer: () => null
               }}
-              disabled={formIsPending}
+              isDisabled={formIsPending}
               onChange={(value) => setSelectedGroups(value)}
               placeholder="Leave this field blank to return all Groups"
               options={createSelectOptions(groups)}
@@ -158,10 +154,12 @@ const CreateInput = () => {
       >
         Save
       </button>
-      <span className="saving">
-        Please wait while we setup the AMP for Endpoints streaming resource...
-      </span>
-    </>
+      {inputIsSaving && (
+        <span className="saving">
+          Please wait while we setup the AMP for Endpoints streaming resource...
+        </span>
+      )}
+    </StyledContainer>
   )
 }
 
