@@ -57,5 +57,5 @@ export const LoaderWrapper = styled.div`
 
 export const ProgressBar = styled.div`
   width: 100%;
-  animation: ${loading} 1s linear;
+  animation: ${loading} 1s linear forwards;
 `

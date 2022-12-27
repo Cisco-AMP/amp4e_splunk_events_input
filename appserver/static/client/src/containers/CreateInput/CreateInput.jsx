@@ -6,8 +6,17 @@ import {
   fetchIndexes,
   saveWithAPI
 } from "./CreateInputSlice"
-import { StyledContainer, StyledInput, StyledSelect } from "./StyledCreateInput"
-import { createSelectOptions, getIds, getNames } from "./helpers"
+import {
+  StyledContainer,
+  StyledIcon,
+  StyledInput,
+  StyledSelect,
+  StyledSpan
+} from "./StyledCreateInput"
+import { createSelectOptions, getIds, getNames, validateInput } from "./helpers"
+import { hideMessages } from "../../components/Messages/MessagesSlice"
+import { fetchInputs } from "../InputsList/InputListSlice"
+import { isEmptyArray } from "formik"
 
 const CreateInput = () => {
   const dispatch = useDispatch()
@@ -22,8 +31,18 @@ const CreateInput = () => {
     (state) => state.createInput.groups
   )
   const inputIsSaving = useSelector((state) => state.createInput.pending)
+  const inputs = useSelector((state) => state.inputsList.inputs.data)
+  const { apiId, apiKey, apiHost } = useSelector(
+    (state) => state.configuration.data
+  )
 
   const formIsPending = groupsPending || eventTypesPending || indexesPending
+  const hasConfigError =
+    !apiId ||
+    !apiKey ||
+    !apiHost ||
+    isEmptyArray(eventTypes) ||
+    isEmptyArray(groups)
 
   const [inputName, setInputName] = useState("")
   const [selectedIndex, setSelectedIndex] = useState({ value: "main" })
@@ -35,22 +54,26 @@ const CreateInput = () => {
     dispatch(fetchIndexes())
     dispatch(fetchEventTypes())
     dispatch(fetchGroups())
+    dispatch(fetchInputs())
   }, [dispatch])
 
   const handleSaveBtnClick = (e) => {
     e.stopPropagation()
+    dispatch(hideMessages())
 
-    dispatch(
-      saveWithAPI({
-        name: inputName,
-        index: selectedIndex.value,
-        stream_name: streamName,
-        event_types: getIds(selectedEventTypes),
-        groups: getIds(selectedGroups),
-        event_types_names: getNames(selectedEventTypes),
-        groups_names: getNames(selectedGroups)
-      })
-    )
+    if (validateInput(inputs, inputName, dispatch)) {
+      dispatch(
+        saveWithAPI({
+          name: inputName,
+          index: selectedIndex.value,
+          stream_name: streamName,
+          event_types: getIds(selectedEventTypes),
+          groups: getIds(selectedGroups),
+          event_types_names: getNames(selectedEventTypes),
+          groups_names: getNames(selectedGroups)
+        })
+      )
+    }
   }
 
   return (
@@ -65,7 +88,7 @@ const CreateInput = () => {
             type="text"
             name="name"
             onChange={(e) => setInputName(e.target.value)}
-            disabled={formIsPending}
+            disabled={formIsPending || hasConfigError}
           />
           <span className="help-inline"></span>
         </div>
@@ -77,7 +100,7 @@ const CreateInput = () => {
           <StyledSelect
             id="splunkIndexes"
             name="index"
-            isDisabled={formIsPending}
+            isDisabled={formIsPending || hasConfigError}
             onChange={(value) => setSelectedIndex(value)}
             options={createSelectOptions(indexes, true)}
             defaultValue={{ option: "main", label: "main" }}
@@ -100,7 +123,7 @@ const CreateInput = () => {
             <StyledInput
               type="text"
               name="stream_name"
-              disabled={formIsPending}
+              disabled={formIsPending || hasConfigError}
               onChange={(e) => setStreamName(e.target.value)}
             />
             <span className="help-inline"></span>
@@ -117,7 +140,7 @@ const CreateInput = () => {
               DropdownIndicator: () => null,
               IndicatorsContainer: () => null
             }}
-            isDisabled={formIsPending}
+            isDisabled={formIsPending || hasConfigError}
             onChange={(value) => setSelectedEventTypes(value)}
             placeholder="Leave this field blank to return all Event types"
             options={createSelectOptions(eventTypes)}
@@ -136,7 +159,7 @@ const CreateInput = () => {
                 DropdownIndicator: () => null,
                 IndicatorsContainer: () => null
               }}
-              isDisabled={formIsPending}
+              isDisabled={formIsPending || hasConfigError}
               onChange={(value) => setSelectedGroups(value)}
               placeholder="Leave this field blank to return all Groups"
               options={createSelectOptions(groups)}
@@ -149,15 +172,16 @@ const CreateInput = () => {
       <button
         className="btn btn-primary"
         id="save-changes"
-        disabled={formIsPending}
+        disabled={formIsPending || hasConfigError || inputIsSaving}
         onClick={handleSaveBtnClick}
       >
-        Save
+        {inputIsSaving && <StyledIcon className="icon-clock" />}
+        {inputIsSaving ? "Save" : "Saving"}
       </button>
       {inputIsSaving && (
-        <span className="saving">
+        <StyledSpan>
           Please wait while we setup the AMP for Endpoints streaming resource...
-        </span>
+        </StyledSpan>
       )}
     </StyledContainer>
   )

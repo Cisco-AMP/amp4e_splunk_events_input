@@ -1,12 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit"
-import inputsListReducer from "./containers/InputsList/InputListSlice"
-import modalReducer from "./components/Modal/ModalSlice"
-import createInput from "./containers/CreateInput/CreateInputSlice"
+import { InputListSlice as inputsList } from "./containers/InputsList"
+import { ModalSlice as modal } from "./components/Modal"
+import { CreateInputSlice as createInput } from "./containers/CreateInput"
+import { MessagesSlice as messages } from "./components/Messages"
+import { ConfigurationSlice as configuration } from "./containers/Configuration"
 
 export const store = configureStore({
   reducer: {
-    inputsList: inputsListReducer,
-    modal: modalReducer,
-    createInput: createInput
+    createInput,
+    configuration,
+    inputsList,
+    messages,
+    modal
   }
 })

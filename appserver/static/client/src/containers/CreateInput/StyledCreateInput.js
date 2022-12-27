@@ -18,3 +18,16 @@ export const StyledInput = styled.input`
   width: 512px;
   height: 36px !important;
 `
+
+export const StyledIcon = styled.i`
+  margin-right: 5px;
+`
+
+export const StyledSpan = styled.span`
+  margin-left: 10px;
+`
+
+export const StyledErrorLink = styled.a`
+  color: #843534;
+  font-weight: 700;
+`

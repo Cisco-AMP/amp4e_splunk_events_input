@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { fetchAPIKey, fetchConfig } from "../../services/credentialsService"
 import { CONTROLLER_URL } from "./constants"
+import { showErrorMessage } from "../../components/Messages/MessagesSlice"
 
 export const fetchInputs = createAsyncThunk(
   "fetchInputs",
@@ -13,33 +13,46 @@ export const fetchInputs = createAsyncThunk(
     ).then((response) => response.json())
 )
 
-export const fetchStreams = createAsyncThunk("fetchStreams", async () => {
-  const { api_id, api_host } = await fetchConfig()
-  const apiKey = await fetchAPIKey(api_id)
+export const fetchStreams = createAsyncThunk(
+  "fetchStreams",
+  async (_, { getState }) => {
+    const { apiId, apiHost, apiKey } = getState()?.configuration.data
 
-  return await fetch(
-    `${CONTROLLER_URL}event_streams_list?api_host=${api_host}&api_id=${api_id}&api_key=${apiKey}`,
-    {
-      method: "GET"
-    }
-  ).then((response) => response.json())
-})
+    return await fetch(
+      `${CONTROLLER_URL}event_streams_list?api_host=${apiHost}&api_id=${apiId}&api_key=${apiKey}`,
+      {
+        method: "GET"
+      }
+    ).then((response) =>
+      response.json().then((parsedResponse) => {
+        if (parsedResponse.success === false) {
+          return []
+        }
+        return parsedResponse
+      })
+    )
+  }
+)
 
 export const deleteInput = createAsyncThunk(
   "deleteInput",
-  async ({ name, acl: { owner, app }, content: { api_id, api_host } }) => {
+  async (
+    { name, acl: { owner, app }, content: { stream_name } },
+    { getState, dispatch }
+  ) => {
     try {
-      const apiKey = await fetchAPIKey(api_id)
+      const { apiId, apiHost, apiKey } = getState()?.configuration.data
 
       const response = await fetch(
-        `/custom/amp4e_events_input/amp_streams_api_controller/delete_stream?api_host=${api_host}&api_id=${api_id}&api_key=${apiKey}&name=${name}`,
+        `/custom/amp4e_events_input/amp_streams_api_controller/delete_stream?api_host=${apiHost}&api_id=${apiId}&api_key=${apiKey}&name=${name}`,
         {
           method: "DELETE"
         }
       ).then((response) => response.json())
 
       if (response.error) {
-        console.info("There is been an error", response.error.error)
+        console.info("There is been an error", response.error)
+        dispatch(showErrorMessage("There is been an error."))
         return
       }
 
@@ -58,30 +71,32 @@ export const deleteInput = createAsyncThunk(
         }
       )
 
-      return { success: response.success, name }
+      return { success: response.success, name, streamName: stream_name }
     } catch (e) {
       console.info("Could not delete the input.")
     }
   }
 )
 
-export const deleteStream = createAsyncThunk("deleteStream", async ({ id }) => {
-  try {
-    const { api_id, api_host } = await fetchConfig()
-    const apiKey = await fetchAPIKey(api_id)
+export const deleteStream = createAsyncThunk(
+  "deleteStream",
+  async ({ id }, { getState }) => {
+    try {
+      const { apiId, apiHost, apiKey } = getState()?.configuration.data
 
-    const response = await fetch(
-      `/custom/amp4e_events_input/amp_streams_api_controller/delete_event_stream?api_host=${api_host}&api_id=${api_id}&api_key=${apiKey}&id=${id}`,
-      {
-        method: "DELETE"
-      }
-    ).then((response) => response.json())
+      const response = await fetch(
+        `/custom/amp4e_events_input/amp_streams_api_controller/delete_event_stream?api_host=${apiHost}&api_id=${apiId}&api_key=${apiKey}&id=${id}`,
+        {
+          method: "DELETE"
+        }
+      ).then((response) => response.json())
 
-    return { success: response.success, id }
-  } catch (e) {
-    console.info("Could not delete the stream.")
+      return { success: response.success, id }
+    } catch (e) {
+      console.info("Could not delete the stream.")
+    }
   }
-})
+)
 
 const initialState = {
   inputs: {
@@ -128,6 +143,13 @@ export const inputsListSlice = createSlice({
         state.inputs = {
           data: state.inputs.data.filter(
             ({ name }) => name !== action.payload.name
+          ),
+          pending: false
+        }
+
+        state.streams = {
+          data: state.streams.data.filter(
+            ({ name }) => name !== action.payload.streamName
           ),
           pending: false
         }

@@ -41,13 +41,14 @@ export const getInputsTableBody = (
     {inputs.map(({ href, name, content, acl }, index) => (
       <tr key={index} data-input-name={name}>
         <td>
-          {!streams.some(({ name }) => name === content.stream_name) && (
-            <WarningIcon
-              className="icon-alert"
-              rel="tooltip"
-              title={DELETED_INPUT_TOOLTIP}
-            />
-          )}
+          {streams.length > 0 &&
+            !streams.some(({ name }) => name === content.stream_name) && (
+              <WarningIcon
+                className="icon-alert"
+                rel="tooltip"
+                title={DELETED_INPUT_TOOLTIP}
+              />
+            )}
           <a href={href}>{name}</a>
         </td>
         <td>{content.index}</td>

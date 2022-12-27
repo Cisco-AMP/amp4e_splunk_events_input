@@ -1,5 +1,6 @@
-import InputsList from "./containers/InputsList/InputsList"
-import CreateInput from "./containers/CreateInput/CreateInput"
+import InputsList from "./containers/InputsList"
+import CreateInput from "./containers/CreateInput"
+import Configuration from "./containers/Configuration"
 
 export const navs = {
   "/en-US/app/amp4e_events_input/amp4e_events_input_list_new": {
@@ -15,6 +16,6 @@ export const navs = {
   "/en-US/app/amp4e_events_input/setup_amp4e_events_input_new": {
     id: "configuration",
     title: "Configuration",
-    view: "Configuration"
+    view: <Configuration />
   }
 }

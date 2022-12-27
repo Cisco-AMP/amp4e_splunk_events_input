@@ -1,6 +1,16 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { fetchAPIKey, fetchConfig } from "../../services/credentialsService"
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit"
 import { CONTROLLER_URL } from "../InputsList/constants"
+import {
+  showDangerMessage,
+  showErrorMessage
+} from "../../components/Messages/MessagesSlice"
+import {
+  CREATE_INPUT_ERROR_IN_LOG,
+  CREATE_INPUT_ERROR_TITLE,
+  SERVER_ERROR_MESSAGE,
+  WRONG_CONFIG_ERROR
+} from "./constants"
+import { getSplunkHeader } from "./helpers"
 
 export const fetchIndexes = createAsyncThunk(
   "fetchIndexes",
@@ -13,74 +23,118 @@ export const fetchIndexes = createAsyncThunk(
     ).then((response) => response.json())
 )
 
-export const fetchEventTypes = createAsyncThunk("fetchEventTypes", async () => {
-  const { api_id, api_host } = await fetchConfig()
-  const apiKey = await fetchAPIKey(api_id)
+export const fetchEventTypes = createAsyncThunk(
+  "fetchEventTypes",
+  async (_, { getState, dispatch }) => {
+    const { apiId, apiHost, apiKey } = getState()?.configuration.data
 
-  return await fetch(
-    `${CONTROLLER_URL}event_types_list?api_host=${api_host}&api_id=${api_id}&api_key=${apiKey}`,
-    {
-      method: "GET"
-    }
-  ).then((response) => response.json())
-})
-
-export const fetchGroups = createAsyncThunk("fetchGroups", async () => {
-  const { api_id, api_host } = await fetchConfig()
-  const apiKey = await fetchAPIKey(api_id)
-
-  return await fetch(
-    `${CONTROLLER_URL}groups_list?api_host=${api_host}&api_id=${api_id}&api_key=${apiKey}`,
-    {
-      method: "GET"
-    }
-  ).then((response) => response.json())
-})
-
-export const saveWithAPI = createAsyncThunk("saveWithAPI", async (data) => {
-  const { api_id, api_host } = await fetchConfig()
-  const apiKey = await fetchAPIKey(api_id)
-
-  const body = new URLSearchParams({
-    ...data,
-    api_host: api_host,
-    api_id: api_id,
-    api_key: apiKey
-  })
-
-  const response = await fetch(`${CONTROLLER_URL}save_stream`, {
-    method: "POST",
-    body: body,
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-      "X-Splunk-Form-Key": document.cookie.match(
-        /splunkweb_csrf_token_8000=(\d+)/
-      )[1]
-    }
-  }).then((response) => response.json())
-
-  if (response.error) {
-    console.info(
-      "Input could not be saved due to server error",
-      response.error.error
-    )
-    return
-  }
-
-  await fetch(
-    `/en-US/splunkd/__raw/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input/${data.name}`,
-    {
-      method: "POST",
-      body: body,
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "X-Splunk-Form-Key": document.cookie.match(
-          /splunkweb_csrf_token_8000=(\d+)/
-        )[1]
+    return await fetch(
+      `${CONTROLLER_URL}event_types_list?api_host=${apiHost}&api_id=${apiId}&api_key=${apiKey}`,
+      {
+        method: "GET"
       }
+    ).then((response) =>
+      response.json().then((parsedResponse) => {
+        if (parsedResponse.success === false) {
+          dispatch(showDangerMessage(WRONG_CONFIG_ERROR))
+          return []
+        }
+        return parsedResponse
+      })
+    )
+  }
+)
+
+export const fetchGroups = createAsyncThunk(
+  "fetchGroups",
+  async (_, { getState, dispatch }) => {
+    const { apiId, apiHost, apiKey } = getState()?.configuration.data
+
+    return await fetch(
+      `${CONTROLLER_URL}groups_list?api_host=${apiHost}&api_id=${apiId}&api_key=${apiKey}`,
+      {
+        method: "GET"
+      }
+    ).then((response) =>
+      response.json().then((parsedResponse) => {
+        if (parsedResponse.success === false) {
+          dispatch(showDangerMessage(WRONG_CONFIG_ERROR))
+          return []
+        }
+        return parsedResponse
+      })
+    )
+  }
+)
+
+export const saveInput = createAsyncThunk(
+  "saveInput",
+  async (data, { getState, dispatch }) => {
+    const { apiId, apiHost } = getState()?.configuration.data
+
+    const body = new URLSearchParams({
+      ...data,
+      api_host: apiHost,
+      api_id: apiId
+    })
+
+    await fetch(
+      `/en-US/splunkd/__raw/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input/${data.name}`,
+      {
+        method: "POST",
+        body: body,
+        headers: getSplunkHeader()
+      }
+    ).then((response) => {
+      if (response.status === 201) {
+        dispatch(showErrorMessage(CREATE_INPUT_ERROR_IN_LOG))
+      } else {
+        window.location.assign("amp4e_events_input_list_new")
+      }
+    })
+  }
+)
+
+export const saveWithAPI = createAsyncThunk(
+  "saveWithAPI",
+  async (data, { getState, dispatch }) => {
+    const { apiId, apiHost, apiKey } = await getState()?.configuration.data
+
+    const body = new URLSearchParams({
+      ...data,
+      api_host: apiHost,
+      api_id: apiId,
+      api_key: apiKey
+    })
+    try {
+      await fetch(`${CONTROLLER_URL}save_stream`, {
+        method: "POST",
+        body: body,
+        headers: getSplunkHeader()
+      }).then((response) => {
+        response.json().then(({ success, error }) => {
+          if (success) {
+            dispatch(saveInput)
+          } else {
+            dispatch(
+              showErrorMessage(
+                <>
+                  {CREATE_INPUT_ERROR_TITLE}
+                  <br />
+                  {(error || [])
+                    .map((err) => err.details.join(<br />))
+                    .join(<br />)}
+                </>
+              )
+            )
+          }
+        })
+      })
+    } catch (e) {
+      dispatch(showErrorMessage(SERVER_ERROR_MESSAGE + e))
     }
-  ).then((response) => response.json())
-})
+  }
+)
 
 const initialState = {
   indexes: {
@@ -141,9 +195,12 @@ export const createInputSlice = createSlice({
     builder.addCase(saveWithAPI.pending, (state) => {
       state.pending = true
     })
-    builder.addCase(saveWithAPI.fulfilled, (state) => {
-      state.pending = false
-    })
+    builder.addMatcher(
+      isAnyOf(saveWithAPI.rejected, saveWithAPI.fulfilled),
+      (state) => {
+        state.pending = false
+      }
+    )
   }
 })
 

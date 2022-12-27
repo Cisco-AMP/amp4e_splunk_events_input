@@ -21,7 +21,7 @@ import {
   StreamsWrapper,
   TableWrapper
 } from "./StyledInputList"
-import Modal from "../../components/Modal/Modal"
+import Modal from "../../components/Modal"
 
 const InputsList = () => {
   const dispatch = useDispatch()
@@ -65,31 +65,33 @@ const InputsList = () => {
               )}
           </TableWrapper>
 
-          <StreamsWrapper>
-            <h2>Unlinked Event Streams</h2>
+          {streams.length > 0 && (
+            <StreamsWrapper>
+              <h2>Unlinked Event Streams</h2>
 
-            <div className="alert alert-info">
-              <i className="icon-alert" />
-              <span id="success-text-unlinked-streams">
-                {UNLINKED_STREAMS_SUCCESS_MESSAGE}
-              </span>
-            </div>
-            <div className="alert alert-error">
-              <i className="icon-alert" />
-              <span id="error-text-unlinked-streams">
-                <strong>{UNLINKED_STREAMS_ERROR_MESSAGE}</strong>
-              </span>
-            </div>
+              <div className="alert alert-info">
+                <i className="icon-alert" />
+                <span id="success-text-unlinked-streams">
+                  {UNLINKED_STREAMS_SUCCESS_MESSAGE}
+                </span>
+              </div>
+              <div className="alert alert-error">
+                <i className="icon-alert" />
+                <span id="error-text-unlinked-streams">
+                  <strong>{UNLINKED_STREAMS_ERROR_MESSAGE}</strong>
+                </span>
+              </div>
 
-            <TableWrapper>
-              {streams.length > 0 &&
-                generateTable(
-                  STREAMS_TABLE_ID,
-                  STREAMS_TABLE_HEADER,
-                  getStreamsTableBody(streams, dispatch, setModalProps)
-                )}
-            </TableWrapper>
-          </StreamsWrapper>
+              <TableWrapper>
+                {streams.length > 0 &&
+                  generateTable(
+                    STREAMS_TABLE_ID,
+                    STREAMS_TABLE_HEADER,
+                    getStreamsTableBody(streams, dispatch, setModalProps)
+                  )}
+              </TableWrapper>
+            </StreamsWrapper>
+          )}
           <Modal {...modalProps} />
         </>
       )}
