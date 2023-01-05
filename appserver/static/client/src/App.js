@@ -29,7 +29,7 @@ const App = () => {
   }, [dispatch, apiId])
 
   useEffect(() => {
-    if (navs[pathname].id === "createInput") {
+    if (navs[pathname].id !== "configuration") {
       dispatch(hideMessages())
       if (!pending && (!apiId || !apiKey || !apiHost)) {
         dispatch(showDangerMessage(EMPTY_CONFIG_ERROR))
@@ -40,7 +40,7 @@ const App = () => {
   return (
     <Container>
       <Messages />
-      {apiKey && navs[pathname].view}
+      {navs[pathname].view}
     </Container>
   )
 }

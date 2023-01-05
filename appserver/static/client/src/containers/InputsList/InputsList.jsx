@@ -31,15 +31,18 @@ const InputsList = () => {
   const { data: streams, pending: streamsPending } = useSelector(
     (state) => state.inputsList.streams
   )
+  const { apiKey } = useSelector((state) => state.configuration.data)
 
   const [modalProps, setModalProps] = useState()
 
   const isPending = inputsPending || streamsPending
 
   useEffect(() => {
-    dispatch(fetchInputs())
-    dispatch(fetchStreams())
-  }, [dispatch])
+    if (apiKey) {
+      dispatch(fetchInputs())
+      dispatch(fetchStreams())
+    }
+  }, [apiKey, dispatch])
 
   return (
     <>

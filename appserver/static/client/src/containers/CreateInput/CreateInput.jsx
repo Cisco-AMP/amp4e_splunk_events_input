@@ -51,11 +51,13 @@ const CreateInput = () => {
   const [selectedGroups, setSelectedGroups] = useState([])
 
   useEffect(() => {
-    dispatch(fetchIndexes())
-    dispatch(fetchEventTypes())
-    dispatch(fetchGroups())
-    dispatch(fetchInputs())
-  }, [dispatch])
+    if (apiKey) {
+      dispatch(fetchIndexes())
+      dispatch(fetchEventTypes())
+      dispatch(fetchGroups())
+      dispatch(fetchInputs())
+    }
+  }, [apiKey, dispatch])
 
   const handleSaveBtnClick = (e) => {
     e.stopPropagation()

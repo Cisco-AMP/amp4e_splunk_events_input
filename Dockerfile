@@ -1,10 +1,5 @@
-FROM splunk/splunk:8.1.2-debian
+FROM splunk/splunk:9.0.2
 USER root
-RUN apt-get update
-RUN apt-get install -y libxml2-dev libxslt-dev libssl-dev python3-cffi libffi-dev openssl netcat
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install fabric
-RUN python3 -m pip uninstall enum
 ENV LD_LIBRARY_PATH=${SPLUNK_HOME}/lib:${LD_LIBRARY_PATH}
 ENV SPLUNK_DB=${SPLUNK_HOME}/var/lib/splunk
 COPY amp_entrypoint.sh /sbin

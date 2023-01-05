@@ -1,3 +1,5 @@
+import { splunkdPath } from "@splunk/splunk-utils/config"
+
 export const CONFIGURATION_LEGEND = "AMP for Endpoints API Access Configuration"
 
 export const API_HOST_LABEL = "AMP for Endpoints API Host"
@@ -22,8 +24,6 @@ export const CONFIG_SAVE_ERROR =
 
 export const CONFIG_SAVE_SUCCESS = "Configuration successfully saved"
 
-export const configURL =
-  "/en-US/splunkd/__raw/services/configs/conf-inputs/amp4e_events_input?output_mode=json"
+export const configURL = `${splunkdPath}/services/configs/conf-inputs/amp4e_events_input?output_mode=json`
 
-export const saveConfigURL =
-  "/en-US/splunkd/__raw/servicesNS/nobody/amp4e_events_input/configs/conf-inputs/amp4e_events_input"
+export const saveConfigURL = `${splunkdPath}/servicesNS/nobody/amp4e_events_input/configs/conf-inputs/amp4e_events_input`

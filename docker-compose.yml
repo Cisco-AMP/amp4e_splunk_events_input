@@ -5,6 +5,7 @@ services:
     build: .
     volumes:
       - .:/opt/splunk/etc/apps/amp4e_events_input
+      - /opt/splunk/etc/apps/amp4e_events_input/.git
     environment:
       - SPLUNK_HOME=/opt/splunk
       - SPLUNK_START_ARGS=--accept-license

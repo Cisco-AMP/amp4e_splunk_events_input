@@ -1,3 +1,5 @@
+import { locale } from "@splunk/splunk-utils/config"
+
 export const CREATE_NEW_INPUT = "Create a New Input"
 
 export const UNLINKED_STREAMS_SUCCESS_MESSAGE =
@@ -46,5 +48,4 @@ export const inputsDeleteModalVerbiage = {
   submit: MODEL_SUBMIT_BUTTON
 }
 
-export const CONTROLLER_URL =
-  "/en-US/custom/amp4e_events_input/amp_streams_api_controller/"
+export const CONTROLLER_URL = `/${locale}/custom/amp4e_events_input/amp_streams_api_controller/`

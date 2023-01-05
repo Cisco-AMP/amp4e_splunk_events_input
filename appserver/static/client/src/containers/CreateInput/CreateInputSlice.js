@@ -1,3 +1,4 @@
+import { splunkdPath } from "@splunk/splunk-utils/config"
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit"
 import { CONTROLLER_URL } from "../InputsList/constants"
 import {
@@ -16,7 +17,7 @@ export const fetchIndexes = createAsyncThunk(
   "fetchIndexes",
   async () =>
     await fetch(
-      "/en-US/splunkd/__raw/services/data/indexes?output_mode=json&search=isInternal%3Dfalse+disabled%3Dfalse&count=-1",
+      `${splunkdPath}/services/data/indexes?output_mode=json&search=isInternal%3Dfalse+disabled%3Dfalse&count=-1`,
       {
         method: "GET"
       }
@@ -79,7 +80,7 @@ export const saveInput = createAsyncThunk(
     })
 
     await fetch(
-      `/en-US/splunkd/__raw/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input/${data.name}`,
+      `${splunkdPath}/servicesNS/nobody/amp4e_events_input/data/inputs/amp4e_events_input/${data.name}`,
       {
         method: "POST",
         body: body,

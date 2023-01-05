@@ -1,3 +1,4 @@
+import { splunkdPath } from "@splunk/splunk-utils/config"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { CONTROLLER_URL } from "./constants"
 import { showErrorMessage } from "../../components/Messages/MessagesSlice"
@@ -6,7 +7,7 @@ export const fetchInputs = createAsyncThunk(
   "fetchInputs",
   async () =>
     await fetch(
-      "/en-US/splunkd/__raw/services/data/inputs/amp4e_events_input?count=-1&output_mode=json",
+      `${splunkdPath}/services/data/inputs/amp4e_events_input?count=-1&output_mode=json`,
       {
         method: "GET"
       }
@@ -57,7 +58,7 @@ export const deleteInput = createAsyncThunk(
       }
 
       await fetch(
-        `/en-US/splunkd/__raw/servicesNS/${owner}/${app}/data/inputs/amp4e_events_input/${encodeURIComponent(
+        `${splunkdPath}/servicesNS/${owner}/${app}/data/inputs/amp4e_events_input/${encodeURIComponent(
           name
         )}`,
         {

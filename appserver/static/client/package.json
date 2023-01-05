@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.1",
+    "@splunk/splunk-utils": "^2.2.4",
     "camelcase-keys": "^8.0.2",
     "formik": "^2.2.9",
     "react": "^18.2.0",
