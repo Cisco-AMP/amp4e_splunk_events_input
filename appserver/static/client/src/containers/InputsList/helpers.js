@@ -49,7 +49,7 @@ export const getInputsTableBody = (
                 title={DELETED_INPUT_TOOLTIP}
               />
             )}
-          <a href={href}>{name}</a>
+          <a href={`edit_amp4e_events_input_new?name=${name}`}>{name}</a>
         </td>
         <td>{content.index}</td>
         <td>{content.stream_name}</td>

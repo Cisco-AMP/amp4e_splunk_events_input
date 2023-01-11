@@ -11,7 +11,24 @@ export const createSelectOptions = (options, isIndex) =>
     label: isIndex ? name : `${name} (${id || guid})`
   }))
 
+export const getSelectedOptions = (options, ids) =>
+  options.map(({ id, guid, name }) => {
+    console.log(
+      ids.some((selectedId) => selectedId === id || selectedId === guid),
+      id,
+      guid
+    )
+    return (
+      ids.some((selectedId) => selectedId === id || selectedId === guid) && {
+        value: id || guid,
+        label: `${name} (${id || guid})`
+      }
+    )
+  })
+
 export const getIds = (selected) => selected.map(({ value }) => value).join(",")
+
+export const parseIds = (ids) => ids.split(",")
 
 export const getNames = (selected) =>
   selected.map(({ label }) => label).join("---")

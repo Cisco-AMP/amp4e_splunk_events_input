@@ -71,6 +71,8 @@ export const saveConfig = createAsyncThunk(
         headers: getSplunkHeader()
       })
       dispatch(showInfoMessage(CONFIG_SAVE_SUCCESS))
+
+      return config
     } catch (e) {
       console.error(e)
     }
@@ -101,6 +103,10 @@ export const configurationSlice = createSlice({
       state.pending = false
     })
     builder.addCase(saveAPIKey.fulfilled, (state) => {
+      state.pending = false
+    })
+    builder.addCase(saveConfig.fulfilled, (state, { payload }) => {
+      state.data = payload
       state.pending = false
     })
   }

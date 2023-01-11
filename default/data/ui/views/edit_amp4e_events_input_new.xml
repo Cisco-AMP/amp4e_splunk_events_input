@@ -1,0 +1,9 @@
+<dashboard version="1.1" script="client/build/static/js/main.min.js" isDashboard="false" isVisible="true" hideEdit="true">
+    <label>Edit Input</label>
+
+    <row>
+        <html>
+            <div id="root">Please wait...</div>
+        </html>
+    </row>
+</dashboard>

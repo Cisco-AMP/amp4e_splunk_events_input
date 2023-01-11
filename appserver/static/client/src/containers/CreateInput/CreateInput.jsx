@@ -13,13 +13,21 @@ import {
   StyledSelect,
   StyledSpan
 } from "./StyledCreateInput"
-import { createSelectOptions, getIds, getNames, validateInput } from "./helpers"
+import {
+  createSelectOptions,
+  getIds,
+  getNames,
+  getSelectedOptions,
+  parseIds,
+  validateInput
+} from "./helpers"
 import { hideMessages } from "../../components/Messages/MessagesSlice"
-import { fetchInputs } from "../InputsList/InputListSlice"
+import { fetchInputs, fetchStreams } from "../InputsList/InputListSlice"
 import { isEmptyArray } from "formik"
 
 const CreateInput = () => {
   const dispatch = useDispatch()
+  const queryName = new URLSearchParams(window.location.search).get("name")
 
   const { data: indexes, pending: indexesPending } = useSelector(
     (state) => state.createInput.indexes
@@ -32,6 +40,11 @@ const CreateInput = () => {
   )
   const inputIsSaving = useSelector((state) => state.createInput.pending)
   const inputs = useSelector((state) => state.inputsList.inputs.data)
+
+  const editedInput = useSelector((state) =>
+    state.inputsList.inputs.data.find(({ name }) => name === queryName)
+  )
+
   const { apiId, apiKey, apiHost } = useSelector(
     (state) => state.configuration.data
   )
@@ -51,13 +64,28 @@ const CreateInput = () => {
   const [selectedGroups, setSelectedGroups] = useState([])
 
   useEffect(() => {
+    if (editedInput) {
+      setInputName(editedInput.name)
+      setSelectedIndex({ value: editedInput?.content.index })
+      setStreamName(editedInput.content.stream_name)
+      setSelectedEventTypes(parseIds(editedInput.content.event_types))
+      setSelectedGroups(parseIds(editedInput.content.groups))
+    }
+  }, [editedInput])
+
+  useEffect(() => {
     if (apiKey) {
-      dispatch(fetchIndexes())
+      if (queryName) {
+        dispatch(fetchStreams())
+      } else {
+        dispatch(fetchIndexes())
+      }
+
       dispatch(fetchEventTypes())
       dispatch(fetchGroups())
       dispatch(fetchInputs())
     }
-  }, [apiKey, dispatch])
+  }, [apiKey, dispatch, queryName])
 
   const handleSaveBtnClick = (e) => {
     e.stopPropagation()
@@ -80,38 +108,42 @@ const CreateInput = () => {
 
   return (
     <StyledContainer>
-      <div className="control-group input_name">
-        <label className="control-label">
-          Name
-          <span className="required">*</span>
-        </label>
-        <div className="controls">
-          <StyledInput
-            type="text"
-            name="name"
-            onChange={(e) => setInputName(e.target.value)}
-            disabled={formIsPending || hasConfigError}
-          />
-          <span className="help-inline"></span>
-        </div>
-      </div>
+      {!queryName && (
+        <>
+          <div className="control-group input_name">
+            <label className="control-label">
+              Name
+              <span className="required">*</span>
+            </label>
+            <div className="controls">
+              <StyledInput
+                type="text"
+                name="name"
+                onChange={(e) => setInputName(e.target.value)}
+                disabled={formIsPending || hasConfigError}
+              />
+              <span className="help-inline"></span>
+            </div>
+          </div>
 
-      <div className="control-group input_index">
-        <label className="control-label">Index</label>
-        <div className="controls">
-          <StyledSelect
-            id="splunkIndexes"
-            name="index"
-            isDisabled={formIsPending || hasConfigError}
-            onChange={(value) => setSelectedIndex(value)}
-            options={createSelectOptions(indexes, true)}
-            defaultValue={{ option: "main", label: "main" }}
-          />
-          <span className="help-block">
-            In which index would you like the events to appear?
-          </span>
-        </div>
-      </div>
+          <div className="control-group input_index">
+            <label className="control-label">Index</label>
+            <div className="controls">
+              <StyledSelect
+                id="splunkIndexes"
+                name="index"
+                isDisabled={formIsPending || hasConfigError}
+                onChange={(value) => setSelectedIndex(value)}
+                options={createSelectOptions(indexes, true)}
+                defaultValue={{ option: "main", label: "main" }}
+              />
+              <span className="help-block">
+                In which index would you like the events to appear?
+              </span>
+            </div>
+          </div>
+        </>
+      )}
 
       <fieldset>
         <legend>Stream Settings</legend>
@@ -127,6 +159,7 @@ const CreateInput = () => {
               name="stream_name"
               disabled={formIsPending || hasConfigError}
               onChange={(e) => setStreamName(e.target.value)}
+              value={streamName}
             />
             <span className="help-inline"></span>
           </div>
@@ -146,6 +179,7 @@ const CreateInput = () => {
             onChange={(value) => setSelectedEventTypes(value)}
             placeholder="Leave this field blank to return all Event types"
             options={createSelectOptions(eventTypes)}
+            value={getSelectedOptions(eventTypes, selectedEventTypes)}
           />
           <span className="help-inline"></span>
         </div>
@@ -165,6 +199,7 @@ const CreateInput = () => {
               onChange={(value) => setSelectedGroups(value)}
               placeholder="Leave this field blank to return all Groups"
               options={createSelectOptions(groups)}
+              value={getSelectedOptions(groups, selectedGroups)}
             />
             <span className="help-inline"></span>
           </div>

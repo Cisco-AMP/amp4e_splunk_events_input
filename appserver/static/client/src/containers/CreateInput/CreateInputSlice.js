@@ -88,9 +88,9 @@ export const saveInput = createAsyncThunk(
       }
     ).then((response) => {
       if (response.status === 201) {
-        dispatch(showErrorMessage(CREATE_INPUT_ERROR_IN_LOG))
-      } else {
         window.location.assign("amp4e_events_input_list_new")
+      } else {
+        dispatch(showErrorMessage(CREATE_INPUT_ERROR_IN_LOG))
       }
     })
   }
@@ -113,9 +113,9 @@ export const saveWithAPI = createAsyncThunk(
         body: body,
         headers: getSplunkHeader()
       }).then((response) => {
-        response.json().then(({ success, error }) => {
+        response.json().then(async ({ success, error }) => {
           if (success) {
-            dispatch(saveInput)
+            await dispatch(saveInput(data))
           } else {
             dispatch(
               showErrorMessage(

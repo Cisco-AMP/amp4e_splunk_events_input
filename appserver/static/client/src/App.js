@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { navs } from "./constants"
@@ -23,24 +23,29 @@ const App = () => {
 
   const pathname = window.location.pathname
 
+  const getPage = useCallback(
+    () => navs.find((nav) => pathname.includes(nav.path)),
+    [pathname]
+  )
+
   useEffect(() => {
     !apiId && dispatch(fetchConfig())
     apiId && dispatch(fetchAPIKey(apiId))
   }, [dispatch, apiId])
 
   useEffect(() => {
-    if (navs[pathname].id !== "configuration") {
+    if (getPage().id !== "configuration") {
       dispatch(hideMessages())
       if (!pending && (!apiId || !apiKey || !apiHost)) {
         dispatch(showDangerMessage(EMPTY_CONFIG_ERROR))
       }
     }
-  }, [apiHost, apiId, apiKey, dispatch, pathname, pending])
+  }, [apiHost, apiId, apiKey, dispatch, getPage, pathname, pending])
 
   return (
     <Container>
       <Messages />
-      {navs[pathname].view}
+      {getPage().view}
     </Container>
   )
 }
