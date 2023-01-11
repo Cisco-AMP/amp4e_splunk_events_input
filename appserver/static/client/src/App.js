@@ -24,7 +24,7 @@ const App = () => {
   const pathname = window.location.pathname
 
   const getPage = useCallback(
-    () => navs.find((nav) => pathname.includes(nav.path)),
+    () => navs?.find((nav) => pathname.includes(nav.path)),
     [pathname]
   )
 

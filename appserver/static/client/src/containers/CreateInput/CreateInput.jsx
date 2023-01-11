@@ -42,7 +42,7 @@ const CreateInput = () => {
   const inputs = useSelector((state) => state.inputsList.inputs.data)
 
   const editedInput = useSelector((state) =>
-    state.inputsList.inputs.data.find(({ name }) => name === queryName)
+    state.inputsList.inputs?.data?.find(({ name }) => name === queryName)
   )
 
   const { apiId, apiKey, apiHost } = useSelector(
