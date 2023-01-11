@@ -1,4 +1,5 @@
 import { splunkdPath } from "@splunk/splunk-utils/config"
+import { defaultFetchInit } from "@splunk/splunk-utils/fetch"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { CONTROLLER_URL } from "./constants"
 import { showErrorMessage } from "../../components/Messages/MessagesSlice"
@@ -63,12 +64,7 @@ export const deleteInput = createAsyncThunk(
         )}`,
         {
           method: "DELETE",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-Splunk-Form-Key": document.cookie.match(
-              /splunkweb_csrf_token_8000=(\d+)/
-            )[1]
-          }
+          headers: defaultFetchInit.headers
         }
       )
 

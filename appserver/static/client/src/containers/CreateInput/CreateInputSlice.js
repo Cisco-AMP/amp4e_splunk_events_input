@@ -1,4 +1,5 @@
 import { splunkdPath } from "@splunk/splunk-utils/config"
+import { defaultFetchInit } from "@splunk/splunk-utils/fetch"
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit"
 import { CONTROLLER_URL } from "../InputsList/constants"
 import {
@@ -98,7 +99,7 @@ export const saveInput = createAsyncThunk(
 
 export const saveWithAPI = createAsyncThunk(
   "saveWithAPI",
-  async (data, { getState, dispatch }) => {
+  async ({ data, editedInput }, { getState, dispatch }) => {
     const { apiId, apiHost, apiKey } = await getState()?.configuration.data
 
     const body = new URLSearchParams({
@@ -115,6 +116,20 @@ export const saveWithAPI = createAsyncThunk(
       }).then((response) => {
         response.json().then(async ({ success, error }) => {
           if (success) {
+            if (editedInput) {
+              await fetch(
+                `${splunkdPath}/servicesNS/${editedInput.acl.owner}/${
+                  editedInput.acl.app
+                }/data/inputs/amp4e_events_input/${encodeURIComponent(
+                  editedInput.name
+                )}`,
+                {
+                  method: "DELETE",
+                  headers: defaultFetchInit.headers
+                }
+              )
+            }
+
             await dispatch(saveInput(data))
           } else {
             dispatch(

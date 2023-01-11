@@ -15,7 +15,6 @@ import {
 } from "./StyledCreateInput"
 import {
   createSelectOptions,
-  getIds,
   getNames,
   getSelectedOptions,
   parseIds,
@@ -91,16 +90,19 @@ const CreateInput = () => {
     e.stopPropagation()
     dispatch(hideMessages())
 
-    if (validateInput(inputs, inputName, dispatch)) {
+    if (validateInput(inputs, inputName, dispatch, !!editedInput)) {
       dispatch(
         saveWithAPI({
-          name: inputName,
-          index: selectedIndex.value,
-          stream_name: streamName,
-          event_types: getIds(selectedEventTypes),
-          groups: getIds(selectedGroups),
-          event_types_names: getNames(selectedEventTypes),
-          groups_names: getNames(selectedGroups)
+          data: {
+            name: inputName,
+            index: selectedIndex.value,
+            stream_name: streamName,
+            event_types: selectedEventTypes.join(","),
+            groups: selectedGroups.join(","),
+            event_types_names: getNames(eventTypes, selectedEventTypes),
+            groups_names: getNames(groups, selectedGroups)
+          },
+          editedInput: editedInput
         })
       )
     }
@@ -176,7 +178,9 @@ const CreateInput = () => {
               IndicatorsContainer: () => null
             }}
             isDisabled={formIsPending || hasConfigError}
-            onChange={(value) => setSelectedEventTypes(value)}
+            onChange={(values) =>
+              setSelectedEventTypes(values.map(({ value }) => value))
+            }
             placeholder="Leave this field blank to return all Event types"
             options={createSelectOptions(eventTypes)}
             value={getSelectedOptions(eventTypes, selectedEventTypes)}
@@ -196,7 +200,9 @@ const CreateInput = () => {
                 IndicatorsContainer: () => null
               }}
               isDisabled={formIsPending || hasConfigError}
-              onChange={(value) => setSelectedGroups(value)}
+              onChange={(values) =>
+                setSelectedGroups(values.map(({ value }) => value))
+              }
               placeholder="Leave this field blank to return all Groups"
               options={createSelectOptions(groups)}
               value={getSelectedOptions(groups, selectedGroups)}

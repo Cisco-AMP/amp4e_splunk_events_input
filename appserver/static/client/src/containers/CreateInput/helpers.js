@@ -12,26 +12,25 @@ export const createSelectOptions = (options, isIndex) =>
   }))
 
 export const getSelectedOptions = (options, ids) =>
-  options.map(({ id, guid, name }) => {
-    console.log(
-      ids.some((selectedId) => selectedId === id || selectedId === guid),
-      id,
-      guid
-    )
-    return (
-      ids.some((selectedId) => selectedId === id || selectedId === guid) && {
+  options.map(
+    ({ id, guid, name }) =>
+      ids?.some(
+        (selectedId) => Number(selectedId) === id || selectedId === guid
+      ) && {
         value: id || guid,
         label: `${name} (${id || guid})`
       }
+  )
+
+export const parseIds = (ids) => ids?.split(",")
+
+export const getNames = (options, selected) =>
+  options
+    .map(({ id, guid, name }) =>
+      selected.some((el) => Number(el) === id || el === guid) ? name : null
     )
-  })
-
-export const getIds = (selected) => selected.map(({ value }) => value).join(",")
-
-export const parseIds = (ids) => ids.split(",")
-
-export const getNames = (selected) =>
-  selected.map(({ label }) => label).join("---")
+    .filter((el) => el)
+    .join("---")
 
 export const getSplunkHeader = () => ({
   "X-Requested-With": "XMLHttpRequest",
@@ -40,12 +39,12 @@ export const getSplunkHeader = () => ({
   )[1]
 })
 
-export const validateInput = (inputs, inputName, dispatch) => {
+export const validateInput = (inputs, inputName, dispatch, isEdit) => {
   if (!inputName.length) {
     dispatch(showErrorMessage(INPUT_TOO_SMALL_ERROR))
   } else if (inputName.length >= 1024) {
     dispatch(showErrorMessage(INPUT_TOO_BIG_ERROR))
-  } else if (inputs.find(({ name }) => name === inputName)) {
+  } else if (!isEdit && inputs.find(({ name }) => name === inputName)) {
     dispatch(showErrorMessage(INPUT_EXISTS_ERROR))
   } else {
     return true
