@@ -49,7 +49,7 @@ const App = () => {
   return (
     <Container>
       <Messages />
-      {getPage().view}
+      {getPage()?.view}
     </Container>
   )
 }
