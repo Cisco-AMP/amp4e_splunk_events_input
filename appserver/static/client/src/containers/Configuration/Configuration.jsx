@@ -16,15 +16,25 @@ import {
   API_KEY_LABEL,
   CONFIG_SAVE_ERROR,
   CONFIGURATION_LEGEND,
+  NO_CONFIG_CAPABILITIES_MESSAGE,
   SAVE_BUTTON
 } from "./constants"
 import { createInitialValues, handleValidate } from "./helpers"
 import { showErrorMessage } from "../../components/Messages/MessagesSlice"
 import { saveAPIKey, saveConfig } from "./ConfigurationSlice"
+import { useEffect } from "react"
 
 const Configuration = () => {
   const dispatch = useDispatch()
-  const { data: config, pending } = useSelector((state) => state.configuration)
+  const {
+    data: config,
+    pending,
+    isAdmin
+  } = useSelector((state) => state.configuration)
+
+  useEffect(() => {
+    !isAdmin && alert("You don't have permission to edit this app")
+  }, [isAdmin])
 
   const handleSubmitConfig = (values, { setSubmitting }) => {
     if (Object.values(values).some((el) => el === "")) {
@@ -39,7 +49,9 @@ const Configuration = () => {
     setSubmitting(false)
   }
 
-  return (
+  return !isAdmin ? (
+    <StyledContainer>{NO_CONFIG_CAPABILITIES_MESSAGE}</StyledContainer>
+  ) : (
     <StyledContainer>
       <legend>{CONFIGURATION_LEGEND}</legend>
       {!pending && (

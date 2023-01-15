@@ -44,7 +44,7 @@ export const validateInput = (inputs, inputName, dispatch, isEdit) => {
     dispatch(showErrorMessage(INPUT_TOO_SMALL_ERROR))
   } else if (inputName.length >= 1024) {
     dispatch(showErrorMessage(INPUT_TOO_BIG_ERROR))
-  } else if (!isEdit && inputs.find(({ name }) => name === inputName)) {
+  } else if (!isEdit && inputs?.find(({ name }) => name === inputName)) {
     dispatch(showErrorMessage(INPUT_EXISTS_ERROR))
   } else {
     return true

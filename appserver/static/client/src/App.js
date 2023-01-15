@@ -6,7 +6,8 @@ import { Container } from "./StyledApp"
 import Messages from "./components/Messages"
 import {
   fetchAPIKey,
-  fetchConfig
+  fetchConfig,
+  getCapabilities
 } from "./containers/Configuration/ConfigurationSlice"
 import {
   hideMessages,
@@ -29,7 +30,10 @@ const App = () => {
   )
 
   useEffect(() => {
-    !apiId && dispatch(fetchConfig())
+    if (!apiId) {
+      dispatch(getCapabilities())
+      dispatch(fetchConfig())
+    }
     apiId && dispatch(fetchAPIKey(apiId))
   }, [dispatch, apiId])
 

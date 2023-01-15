@@ -1,5 +1,7 @@
 import { splunkdPath } from "@splunk/splunk-utils/config"
 
+export const NO_CONFIG_CAPABILITIES_MESSAGE =
+  "Sorry, you don't have permission to perform setup"
 export const CONFIGURATION_LEGEND = "AMP for Endpoints API Access Configuration"
 
 export const API_HOST_LABEL = "AMP for Endpoints API Host"

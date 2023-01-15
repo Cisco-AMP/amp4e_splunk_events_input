@@ -1,5 +1,8 @@
 import { StyledErrorLink } from "./StyledCreateInput"
 
+export const NO_CREATE_CAPABILITIES_ERROR =
+  "Sorry, you don't have permission to create/edit inputs"
+
 export const SERVER_ERROR_MESSAGE =
   "Input could not be saved due to server error"
 

@@ -5,6 +5,7 @@ import snakecaseKeys from "snakecase-keys"
 import { getSplunkHeader } from "../CreateInput/helpers"
 import { CONFIG_SAVE_SUCCESS, configURL, saveConfigURL } from "./constants"
 import { showInfoMessage } from "../../components/Messages/MessagesSlice"
+import { fetchCapabilities } from "@splunk/splunk-utils/capabilities"
 
 export const saveAPIKey = createAsyncThunk(
   "saveAPIKey",
@@ -54,6 +55,19 @@ export const fetchConfig = createAsyncThunk("fetchConfig", () => {
   }
 })
 
+export const getCapabilities = createAsyncThunk("getCapabilities", () => {
+  try {
+    return (
+      window.$C.SPLUNKD_FREE_LICENSE ||
+      fetchCapabilities().then((response) =>
+        response.entry[0].content.capabilities.includes("admin_all_objects")
+      )
+    )
+  } catch (e) {
+    console.error(e)
+  }
+})
+
 export const saveConfig = createAsyncThunk(
   "saveConfig",
   async (config, { dispatch }) => {
@@ -81,6 +95,7 @@ export const saveConfig = createAsyncThunk(
 
 const initialState = {
   data: {},
+  isAdmin: true,
   pending: false
 }
 
@@ -101,6 +116,9 @@ export const configurationSlice = createSlice({
     builder.addCase(fetchAPIKey.fulfilled, (state, { payload }) => {
       state.data.apiKey = payload
       state.pending = false
+    })
+    builder.addCase(getCapabilities.fulfilled, (state, { payload }) => {
+      state.isAdmin = payload
     })
     builder.addCase(saveAPIKey.fulfilled, (state) => {
       state.pending = false

@@ -23,6 +23,7 @@ import {
 import { hideMessages } from "../../components/Messages/MessagesSlice"
 import { fetchInputs, fetchStreams } from "../InputsList/InputListSlice"
 import { isEmptyArray } from "formik"
+import { NO_CREATE_CAPABILITIES_ERROR } from "./constants"
 
 const CreateInput = () => {
   const dispatch = useDispatch()
@@ -44,9 +45,10 @@ const CreateInput = () => {
     state.inputsList.inputs?.data?.find(({ name }) => name === queryName)
   )
 
-  const { apiId, apiKey, apiHost } = useSelector(
-    (state) => state.configuration.data
-  )
+  const {
+    data: { apiId, apiKey, apiHost },
+    isAdmin
+  } = useSelector((state) => state.configuration)
 
   const formIsPending = groupsPending || eventTypesPending || indexesPending
   const hasConfigError =
@@ -61,6 +63,10 @@ const CreateInput = () => {
   const [streamName, setStreamName] = useState("")
   const [selectedEventTypes, setSelectedEventTypes] = useState([])
   const [selectedGroups, setSelectedGroups] = useState([])
+
+  useEffect(() => {
+    !isAdmin && alert("You don't have permission to edit this input")
+  }, [isAdmin])
 
   useEffect(() => {
     if (editedInput) {
@@ -108,7 +114,9 @@ const CreateInput = () => {
     }
   }
 
-  return (
+  return !isAdmin ? (
+    <StyledContainer>{NO_CREATE_CAPABILITIES_ERROR}</StyledContainer>
+  ) : (
     <StyledContainer>
       {!queryName && (
         <>
