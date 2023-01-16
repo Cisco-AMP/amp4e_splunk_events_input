@@ -89,7 +89,7 @@ export const saveInput = createAsyncThunk(
       }
     ).then((response) => {
       if (response.status === 201) {
-        window.location.assign("amp4e_events_input_list_new")
+        window.location.assign("amp4e_events_input_list")
       } else {
         dispatch(showErrorMessage(CREATE_INPUT_ERROR_IN_LOG))
       }

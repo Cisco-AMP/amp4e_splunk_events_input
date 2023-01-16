@@ -40,7 +40,7 @@ export const EMPTY_CONFIG_ERROR = (
     {" "}
     It appears your configuration is incomplete, so you will not be able to
     create any inputs. Please update your{" "}
-    <StyledErrorLink href="setup_amp4e_events_input_new">
+    <StyledErrorLink href="setup_amp4e_events_input">
       configuration
     </StyledErrorLink>
     .
@@ -52,7 +52,7 @@ export const WRONG_CONFIG_ERROR = (
     {" "}
     We couldn’t retrieve the information from API with provided credentials.
     Please make sure the API host is accessible or{" "}
-    <StyledErrorLink href="setup_amp4e_events_input_new">
+    <StyledErrorLink href="setup_amp4e_events_input">
       re-configure
     </StyledErrorLink>{" "}
     the input with correct credentials.

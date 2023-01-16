@@ -50,7 +50,7 @@ const InputsList = () => {
         className="btn-group create-content new-input-button-group"
         id="createInputButton"
       >
-        <a className="btn btn-primary" href="create_amp4e_events_input_new">
+        <a className="btn btn-primary" href="create_amp4e_events_input">
           {CREATE_NEW_INPUT}
         </a>
       </CreateButtonWrapper>
