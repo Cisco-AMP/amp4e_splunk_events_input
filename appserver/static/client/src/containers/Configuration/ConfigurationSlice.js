@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit"
+import { defaultFetchInit } from "@splunk/splunk-utils/fetch"
+import { fetchCapabilities } from "@splunk/splunk-utils/capabilities"
+
 import { getApiKeyURL } from "./helpers"
 import camelcaseKeys from "camelcase-keys"
 import snakecaseKeys from "snakecase-keys"
-import { getSplunkHeader } from "../CreateInput/helpers"
 import { CONFIG_SAVE_SUCCESS, configURL, saveConfigURL } from "./constants"
 import { showInfoMessage } from "../../components/Messages/MessagesSlice"
-import { fetchCapabilities } from "@splunk/splunk-utils/capabilities"
 
 export const saveAPIKey = createAsyncThunk(
   "saveAPIKey",
@@ -18,7 +19,7 @@ export const saveAPIKey = createAsyncThunk(
       await fetch(getApiKeyURL("save_api_key"), {
         method: "POST",
         body,
-        headers: getSplunkHeader()
+        headers: defaultFetchInit.headers
       })
     } catch (e) {
       console.error(e)
@@ -82,7 +83,7 @@ export const saveConfig = createAsyncThunk(
       await fetch(saveConfigURL, {
         method: "POST",
         body: body,
-        headers: getSplunkHeader()
+        headers: defaultFetchInit.headers
       })
       dispatch(showInfoMessage(CONFIG_SAVE_SUCCESS))
 

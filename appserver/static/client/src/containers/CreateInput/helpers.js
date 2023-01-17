@@ -32,13 +32,6 @@ export const getNames = (options, selected) =>
     .filter((el) => el)
     .join("---")
 
-export const getSplunkHeader = () => ({
-  "X-Requested-With": "XMLHttpRequest",
-  "X-Splunk-Form-Key": document.cookie.match(
-    /splunkweb_csrf_token_8000=(\d+)/
-  )[1]
-})
-
 export const validateInput = (inputs, inputName, dispatch, isEdit) => {
   if (!inputName.length) {
     dispatch(showErrorMessage(INPUT_TOO_SMALL_ERROR))

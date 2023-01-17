@@ -12,7 +12,6 @@ import {
   SERVER_ERROR_MESSAGE,
   WRONG_CONFIG_ERROR
 } from "./constants"
-import { getSplunkHeader } from "./helpers"
 
 export const fetchIndexes = createAsyncThunk(
   "fetchIndexes",
@@ -85,7 +84,7 @@ export const saveInput = createAsyncThunk(
       {
         method: "POST",
         body: body,
-        headers: getSplunkHeader()
+        headers: defaultFetchInit.headers
       }
     ).then((response) => {
       if (response.status === 201) {
@@ -112,7 +111,7 @@ export const saveWithAPI = createAsyncThunk(
       await fetch(`${CONTROLLER_URL}save_stream`, {
         method: "POST",
         body: body,
-        headers: getSplunkHeader()
+        headers: defaultFetchInit.headers
       }).then((response) => {
         response.json().then(async ({ success, error }) => {
           if (success) {
