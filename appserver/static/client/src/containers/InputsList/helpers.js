@@ -41,7 +41,7 @@ export const getInputsTableBody = (
     {inputs.map(({ href, name, content, acl }, index) => (
       <tr key={index} data-input-name={name}>
         <td>
-          {streams.length > 0 &&
+          {streams?.length > 0 &&
             !streams.some(({ name }) => name === content.stream_name) && (
               <WarningIcon
                 className="icon-alert"

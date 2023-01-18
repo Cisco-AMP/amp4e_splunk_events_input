@@ -33,9 +33,9 @@ export const getNames = (options, selected) =>
     .join("---")
 
 export const validateInput = (inputs, inputName, dispatch, isEdit) => {
-  if (!inputName.length) {
+  if (!inputName?.length) {
     dispatch(showErrorMessage(INPUT_TOO_SMALL_ERROR))
-  } else if (inputName.length >= 1024) {
+  } else if (inputName?.length >= 1024) {
     dispatch(showErrorMessage(INPUT_TOO_BIG_ERROR))
   } else if (!isEdit && inputs?.find(({ name }) => name === inputName)) {
     dispatch(showErrorMessage(INPUT_EXISTS_ERROR))

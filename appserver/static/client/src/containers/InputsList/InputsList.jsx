@@ -60,7 +60,7 @@ const InputsList = () => {
       ) : (
         <>
           <TableWrapper>
-            {inputs.length > 0 &&
+            {inputs?.length > 0 &&
               generateTable(
                 INPUTS_TABLE_ID,
                 INPUTS_TABLE_HEADER,
@@ -68,7 +68,7 @@ const InputsList = () => {
               )}
           </TableWrapper>
 
-          {streams.length > 0 && (
+          {streams?.length > 0 && (
             <StreamsWrapper>
               <h2>Unlinked Event Streams</h2>
 
@@ -86,7 +86,7 @@ const InputsList = () => {
               </div>
 
               <TableWrapper>
-                {streams.length > 0 &&
+                {streams?.length > 0 &&
                   generateTable(
                     STREAMS_TABLE_ID,
                     STREAMS_TABLE_HEADER,
