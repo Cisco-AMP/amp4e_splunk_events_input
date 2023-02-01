@@ -8,3 +8,5 @@ metadata/local.meta
 /release/*.spl
 .DS_Store
 .secrets
+/appserver/static/client/node_modules/
+/appserver/static/client/package-lock.json
